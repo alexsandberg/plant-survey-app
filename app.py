@@ -23,6 +23,12 @@ def create_app(test_config=None):
                              'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
+    # ROUTES
+
+    @app.route('/')
+    def index():
+        pass
+
     return app
 
 
