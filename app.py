@@ -81,10 +81,71 @@ def create_app(test_config=None):
             print('ERROR: ', str(e))
             abort(422)
 
+        # return plant if success
         return jsonify({
             "success": True,
             "plant": plant.format()
         })
+
+    @app.route('/plants/<int:id>', methods=['PATCH', 'DELETE'])
+    def edit_or_delete_plant(id):
+
+        # if PATCH
+        if request.method == 'PATCH':
+
+            # get plant by id
+            plant = Plant.query.filter_by(id=id).one_or_none()
+
+            # get request body
+            body = request.get_json()
+
+            # update plant with data from body
+            if body.get('name'):
+                plant.name = body.get('name')
+
+            if body.get('latinName'):
+                plant.latin_name = body.get('latinName')
+
+            if body.get('description'):
+                plant.description = body.get('description')
+
+            if body.get('imageLink'):
+                plant.image_link = body.get('imageLink')
+
+            try:
+                # update plant in database
+                plant.insert()
+            except Exception as e:
+                print('ERROR: ', str(e))
+                abort(422)
+
+            # return plant if success
+            return jsonify({
+                "success": True,
+                "plant": plant.format()
+            })
+
+        # if DELETE
+        if request.method == 'DELETE':
+
+            # get plant by id
+            plant = Plant.query.filter_by(id=id).one_or_none()
+
+            # save plant name
+            plant_name = plant.name
+
+            try:
+                # delete plant from the database
+                plant.delete()
+            except Exception as e:
+                print('ERROR: ', str(e))
+                abort(422)
+
+            # return plant name if successfully deleted
+            return jsonify({
+                "success": True,
+                "plant_name": plant_name
+            })
 
     return app
 
