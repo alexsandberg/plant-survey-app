@@ -51,6 +51,41 @@ def create_app(test_config=None):
             'plants': plants_formatted
         })
 
+    @app.route('/plants/new', methods=['POST'])
+    def new_plant():
+        print('TEST')
+        # load the request body
+        body = request.get_json()
+
+        print('BODY: ', body)
+
+        # load data from body
+        name = body.get('name')
+        latin_name = body.get('latinName')
+        description = body.get('description')
+        image_link = body.get('imageLink')
+
+        # ensure all fields have data
+        if ((name is None) or (latin_name is None)
+                or (description is None) or (image_link is None)):
+            abort(422)
+
+        # create a new plant
+        plant = Plant(name=name, latin_name=latin_name,
+                      description=description, image_link=image_link)
+
+        try:
+            # add plant to the database
+            plant.insert()
+        except Exception as e:
+            print('ERROR: ', str(e))
+            abort(422)
+
+        return jsonify({
+            "success": True,
+            "plant": plant.format()
+        })
+
     return app
 
 
