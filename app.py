@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, abort, jsonify, render_template, redirect
 from models import setup_db
 from flask_cors import CORS
-from models import Plant, PlantInstance
+from models import Plant, Observation
 
 
 def create_app(test_config=None):
@@ -31,7 +31,8 @@ def create_app(test_config=None):
     # home page route handler
     @app.route('/')
     def index():
-        return render_template('pages/home.html')
+        # TODO build frontend
+        pass
 
     @app.route('/plants')
     def plants():
@@ -146,6 +147,13 @@ def create_app(test_config=None):
                 "success": True,
                 "plant_name": plant_name
             })
+
+    @app.route('/observations')
+    def plant_observations():
+
+        # get all plant observations
+
+        pass
 
     return app
 

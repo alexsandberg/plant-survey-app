@@ -33,8 +33,8 @@ class Plant(db.Model):
     latin_name = Column(String(120), nullable=False)
     description = Column(String(2500), nullable=False)
     image_link = Column(String(500), nullable=False)
-    plant_instances = db.relationship(
-        'PlantInstance', backref='plant', lazy=True)
+    plant_observations = db.relationship(
+        'Observations', backref='plant', lazy=True)
 
     def __init__(self, name, latin_name, description, image_link):
         self.name = name
@@ -64,7 +64,7 @@ class Plant(db.Model):
             'latin_name': self.latin_name,
             'description': self.description,
             'image_link': self.image_link,
-            'plant_instances': self.plant_instances
+            'plant_observations': self.plant_observations
         }
 
 
@@ -73,8 +73,8 @@ Plant Instance
 '''
 
 
-class PlantInstance(db.Model):
-    __tablename__ = 'PlantInstance'
+class Observation(db.Model):
+    __tablename__ = 'Observations'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(120), nullable=False)
@@ -92,7 +92,7 @@ class PlantInstance(db.Model):
         self.notes = notes
 
     def __repr__(self):
-        return f'<PlantInstance: Name {self.plant_id}, Date {self.date}, Plant ID {self.plant_id}>'
+        return f'<Observation: Name {self.plant_id}, Date {self.date}, Plant ID {self.plant_id}>'
 
     def insert(self):
         db.session.add(self)
