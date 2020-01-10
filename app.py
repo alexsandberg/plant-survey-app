@@ -312,7 +312,7 @@ def create_app(test_config=None):
     Error handling for bad request
     '''
     @app.errorhandler(400)
-    def resource_not_found(error):
+    def bad_request(error):
         return jsonify({
             "success": False,
             "error": 400,
