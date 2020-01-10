@@ -34,7 +34,7 @@ class Plant(db.Model):
     description = Column(String(2500), nullable=False)
     image_link = Column(String(500), nullable=False)
     plant_observations = db.relationship(
-        'Observations', backref='plant', lazy=True)
+        'Observation', backref='plant', lazy=True)
 
     def __init__(self, name, latin_name, description, image_link):
         self.name = name
