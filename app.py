@@ -2,7 +2,9 @@ import os
 from flask import Flask, request, abort, jsonify, render_template, redirect
 from models import setup_db
 from flask_cors import CORS
+
 from models import Plant, Observation
+from .auth.auth import AuthError, requires_auth
 
 
 def create_app(test_config=None):
@@ -69,7 +71,8 @@ def create_app(test_config=None):
         })
 
     @app.route('/plants/new', methods=['POST'])
-    def new_plant():
+    @requires_auth('post:plants')
+    def new_plant(jwt):
 
         # load the request body
         body = request.get_json()
@@ -103,7 +106,11 @@ def create_app(test_config=None):
         })
 
     @app.route('/plants/<int:id>', methods=['PATCH', 'DELETE'])
-    def edit_or_delete_plant(id):
+    @requires_auth('edit_or_delete:plants')
+    def edit_or_delete_plant(*args, **kwargs):
+
+        # get id from kwargs
+        id = kwargs['id']
 
         # if PATCH
         if request.method == 'PATCH':
