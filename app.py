@@ -203,6 +203,62 @@ def create_app(test_config=None):
                 'observations': observations_formatted
             })
 
+    @app.route('/observations/<int:id>', methods=['PATCH', 'DELETE'])
+    def edit_or_delete_observation(id):
+
+        # if PATCH
+        if request.method == 'PATCH':
+
+            # get observation by id
+            observation = Observation.query.filter_by(id=id).one_or_none()
+
+            # get request body
+            body = request.get_json()
+
+            # update observation with data from body
+            if body.get('name'):
+                observation.name = body.get('name')
+
+            if body.get('date'):
+                observation.date = body.get('date')
+
+            if body.get('plantID'):
+                observation.plant_id = body.get('plantID')
+
+            if body.get('notes'):
+                observation.notes = body.get('notes')
+
+            try:
+                # update observation in database
+                observation.insert()
+            except Exception as e:
+                print('ERROR: ', str(e))
+                abort(422)
+
+            # return observation if success
+            return jsonify({
+                "success": True,
+                "observation": observation.format()
+            })
+
+        # if DELETE
+        if request.method == 'DELETE':
+
+            # get observation by id
+            observation = Observation.query.filter_by(id=id).one_or_none()
+
+            try:
+                # delete observation from the database
+                observation.delete()
+            except Exception as e:
+                print('ERROR: ', str(e))
+                abort(422)
+
+            # return success
+            return jsonify({
+                "success": True
+            })
+
     return app
 
 
