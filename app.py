@@ -54,11 +54,9 @@ def create_app(test_config=None):
 
     @app.route('/plants/new', methods=['POST'])
     def new_plant():
-        print('TEST')
+
         # load the request body
         body = request.get_json()
-
-        print('BODY: ', body)
 
         # load data from body
         name = body.get('name')
@@ -148,29 +146,62 @@ def create_app(test_config=None):
                 "plant_name": plant_name
             })
 
-    @app.route('/observations')
+    @app.route('/observations', methods=['GET', 'POST'])
     def plant_observations():
 
-        # get all plant observations
-        observations = Observation.query.all()
+        # POST REQUESTS
+        if request.method == 'POST':
+            # load the request body
+            body = request.get_json()
 
-        print('OBSERVATIONS: ', observations)
+            # load data from body
+            name = body.get('name')
+            date = body.get('date')
+            plant_id = body.get('plantID')
+            notes = body.get('notes')
 
-        # if no observations
-        if not observations:
-            abort(404)
+            # ensure required fields have data
+            if ((name is None) or (date is None)
+                    or (plant_id is None)):
+                abort(422)
 
-        observations_formatted = []
+            # create a new plant
+            observation = Observation(
+                name=name, date=date, plant_id=plant_id, notes=notes)
 
-        # format each plant
-        for observation in observations:
-            observations_formatted.append(observation.format())
+            try:
+                # add observation to the database
+                observation.insert()
+            except Exception as e:
+                print('ERROR: ', str(e))
+                abort(422)
 
-        # return plants
-        return jsonify({
-            'success': True,
-            'observations': observations_formatted
-        })
+            # return observation if success
+            return jsonify({
+                "success": True,
+                "observation": observation.format()
+            })
+
+        # GET REQUESTS
+        else:
+            # get all plant observations
+            observations = Observation.query.all()
+
+            # if no observations
+            if not observations:
+                abort(404)
+
+            observations_formatted = []
+
+            # format each plant
+            for observation in observations:
+                observations_formatted.append(observation.format())
+
+            # return plants
+            return jsonify({
+                'success': True,
+                'observations': observations_formatted
+            })
 
     return app
 
