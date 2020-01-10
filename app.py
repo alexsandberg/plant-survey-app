@@ -285,6 +285,49 @@ def create_app(test_config=None):
                 "success": True
             })
 
+    # Error Handling
+    '''
+    Error handling for unprocessable entity
+    '''
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            "success": False,
+            "error": 422,
+            "message": "unprocessable"
+        }), 422
+
+    '''
+    Error handling for resource not found
+    '''
+    @app.errorhandler(404)
+    def resource_not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "resource not found"
+        }), 404
+
+    '''
+    Error handling for bad request
+    '''
+    @app.errorhandler(400)
+    def resource_not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 400,
+            "message": "bad request"
+        }), 400
+
+    '''
+    Error handling for AuthError
+    '''
+    @app.errorhandler(AuthError)
+    def handle_auth_error(ex):
+        response = jsonify(ex.error)
+        response.status_code = ex.status_code
+        return response
+
     return app
 
 
