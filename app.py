@@ -152,8 +152,25 @@ def create_app(test_config=None):
     def plant_observations():
 
         # get all plant observations
+        observations = Observation.query.all()
 
-        pass
+        print('OBSERVATIONS: ', observations)
+
+        # if no observations
+        if not observations:
+            abort(404)
+
+        observations_formatted = []
+
+        # format each plant
+        for observation in observations:
+            observations_formatted.append(observation.format())
+
+        # return plants
+        return jsonify({
+            'success': True,
+            'observations': observations_formatted
+        })
 
     return app
 
