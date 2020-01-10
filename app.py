@@ -192,6 +192,7 @@ def create_app(test_config=None):
         })
 
     @app.route('/observations', methods=['POST'])
+    @requires_auth('post:observations')
     def post_plant_observation():
         # load the request body
         body = request.get_json()
@@ -225,6 +226,7 @@ def create_app(test_config=None):
         })
 
     @app.route('/observations/<int:id>', methods=['PATCH', 'DELETE'])
+    @requires_auth('edit_or_delete:observations')
     def edit_or_delete_observation(id):
 
         # if PATCH
