@@ -63,13 +63,12 @@ class Plant(db.Model):
             'name': self.name,
             'latin_name': self.latin_name,
             'description': self.description,
-            'image_link': self.image_link,
-            'plant_observations': self.plant_observations
+            'image_link': self.image_link
         }
 
 
 '''
-Plant Instance
+Plant Observations
 '''
 
 

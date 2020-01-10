@@ -44,7 +44,23 @@ def create_app(test_config=None):
 
         # format each plant
         for plant in plants:
-            plants_formatted.append(plant.format())
+
+            # get plant observations
+            observations = plant.plant_observations
+
+            # format plan
+            plant = plant.format()
+
+            plant_observations = []
+
+            # format each observation
+            for observation in observations:
+                plant_observations.append(observation.format())
+
+            # add formatted observations to formatted plant
+            plant['plant_observations'] = plant_observations
+
+            plants_formatted.append(plant)
 
         # return plants
         return jsonify({
