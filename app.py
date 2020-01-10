@@ -4,7 +4,7 @@ from models import setup_db
 from flask_cors import CORS
 
 from models import Plant, Observation
-from .auth.auth import AuthError, requires_auth
+from auth.auth import AuthError, requires_auth
 
 
 def create_app(test_config=None):
@@ -169,62 +169,60 @@ def create_app(test_config=None):
                 "plant_name": plant_name
             })
 
-    @app.route('/observations', methods=['GET', 'POST'])
-    def plant_observations():
+    @app.route('/observations')
+    def get_plant_observations():
 
-        # POST REQUESTS
-        if request.method == 'POST':
-            # load the request body
-            body = request.get_json()
+        # get all plant observations
+        observations = Observation.query.all()
 
-            # load data from body
-            name = body.get('name')
-            date = body.get('date')
-            plant_id = body.get('plantID')
-            notes = body.get('notes')
+        # if no observations
+        if not observations:
+            abort(404)
 
-            # ensure required fields have data
-            if ((name is None) or (date is None)
-                    or (plant_id is None)):
-                abort(422)
+        observations_formatted = []
 
-            # create a new plant
-            observation = Observation(
-                name=name, date=date, plant_id=plant_id, notes=notes)
+        # format each plant
+        for observation in observations:
+            observations_formatted.append(observation.format())
 
-            try:
-                # add observation to the database
-                observation.insert()
-            except Exception as e:
-                print('ERROR: ', str(e))
-                abort(422)
+        # return plants
+        return jsonify({
+            'success': True,
+            'observations': observations_formatted
+        })
 
-            # return observation if success
-            return jsonify({
-                "success": True,
-                "observation": observation.format()
-            })
+    @app.route('/observations', methods=['POST'])
+    def post_plant_observation():
+        # load the request body
+        body = request.get_json()
 
-        # GET REQUESTS
-        else:
-            # get all plant observations
-            observations = Observation.query.all()
+        # load data from body
+        name = body.get('name')
+        date = body.get('date')
+        plant_id = body.get('plantID')
+        notes = body.get('notes')
 
-            # if no observations
-            if not observations:
-                abort(404)
+        # ensure required fields have data
+        if ((name is None) or (date is None)
+                or (plant_id is None)):
+            abort(422)
 
-            observations_formatted = []
+        # create a new plant
+        observation = Observation(
+            name=name, date=date, plant_id=plant_id, notes=notes)
 
-            # format each plant
-            for observation in observations:
-                observations_formatted.append(observation.format())
+        try:
+            # add observation to the database
+            observation.insert()
+        except Exception as e:
+            print('ERROR: ', str(e))
+            abort(422)
 
-            # return plants
-            return jsonify({
-                'success': True,
-                'observations': observations_formatted
-            })
+        # return observation if success
+        return jsonify({
+            "success": True,
+            "observation": observation.format()
+        })
 
     @app.route('/observations/<int:id>', methods=['PATCH', 'DELETE'])
     def edit_or_delete_observation(id):
