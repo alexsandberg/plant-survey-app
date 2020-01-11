@@ -42,6 +42,10 @@ def create_app(test_config=None):
         # get all plants from database
         plants = Plant.query.all()
 
+        # 404 if no plants found
+        if len(plants) == 0:
+            abort(404)
+
         plants_formatted = []
 
         # format each plant
