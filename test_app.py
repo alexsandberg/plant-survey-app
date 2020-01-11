@@ -30,6 +30,20 @@ class TriviaTestCase(unittest.TestCase):
         """Executed after reach test"""
         pass
 
+    def test_get_plants(self):
+        """Tests get plants success"""
+
+        # get response and load data
+        response = self.client().get('/plants')
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+        # check that data returned for plants
+        self.assertTrue(data['plants'])
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
