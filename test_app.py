@@ -114,6 +114,22 @@ class TriviaTestCase(unittest.TestCase):
         # check that data returned for plants
         self.assertTrue(data['plants'])
 
+    def test_patch_plant_success(self):
+        """Tests PATCH plant success"""
+
+        # get headers using ADMIN token
+        headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
+
+        # get response with updated name json and load data
+        response = self.client().patch('/plants/19', json={'name': 'PATCH TEST'},
+                                       headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['plant']['name'], 'PATCH TEST')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
