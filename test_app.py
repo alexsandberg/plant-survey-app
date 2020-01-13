@@ -44,6 +44,18 @@ class TriviaTestCase(unittest.TestCase):
         # check that data returned for plants
         self.assertTrue(data['plants'])
 
+    def test_405_plants_method_not_allowed(self):
+        """Tests method not allowed 405"""
+
+        # get response and load data
+        response = self.client().post('/plants')
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'method not allowed')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
