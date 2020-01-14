@@ -166,8 +166,9 @@ def create_app(test_config=None):
             # get plant by id
             plant = Plant.query.filter_by(id=id).one_or_none()
 
-            # save plant name
+            # save plant name and id
             plant_name = plant.name
+            plant_id = plant.id
 
             try:
                 # delete plant from the database
@@ -179,7 +180,8 @@ def create_app(test_config=None):
             # return plant name if successfully deleted
             return jsonify({
                 "success": True,
-                "plant_name": plant_name
+                "plant_name": plant_name,
+                "plant_id": plant_id
             })
 
     @app.route('/observations')

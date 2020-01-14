@@ -56,7 +56,7 @@ class TriviaTestCase(unittest.TestCase):
             )}
 
     # first test runs with empty database
-    def no_plants_found_404(self):
+    def test_get_plant_failure(self):
         """Tests GET plants failure"""
 
         # get response and load data
@@ -121,7 +121,7 @@ class TriviaTestCase(unittest.TestCase):
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
 
         # set json data
-        data = {
+        request_data = {
             'name': 'PATCH TEST',
             'latinName': None,
             'description': None,
@@ -129,7 +129,7 @@ class TriviaTestCase(unittest.TestCase):
         }
 
         # get response with updated name json and load data
-        response = self.client().patch('/plants/19', json=data,
+        response = self.client().patch('/plants/19', json=request_data,
                                        headers=headers)
         data = json.loads(response.data)
 
@@ -145,7 +145,7 @@ class TriviaTestCase(unittest.TestCase):
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
 
         # set malformed json data
-        data = {
+        request_data = {
             'nome': 'PATCH TEST',
             'latinName': None,
             'description': None,
@@ -153,7 +153,7 @@ class TriviaTestCase(unittest.TestCase):
         }
 
         # get response with malformed json and load data
-        response = self.client().patch('/plants/19', json=data,
+        response = self.client().patch('/plants/19', json=request_data,
                                        headers=headers)
         data = json.loads(response.data)
 
@@ -161,6 +161,35 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'unprocessable')
+
+    def test_delete_plant_success(self):
+        """Tests DELETE plant success"""
+
+        # create a new plant to be deleted
+        plant = Plant(name=self.test_plant['name'],
+                      latin_name=self.test_plant['latinName'],
+                      description=self.test_plant['description'],
+                      image_link=self.test_plant['imageLink'])
+        plant.insert()
+
+        # get the id of the new plant
+        plant_id = plant.id
+
+        # get headers using ADMIN token
+        headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
+
+        # delete the question and store response
+        response = self.client().delete('/plants/{}'.format(plant_id),
+                                        headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and success message
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+        # check if question and name match deleted plant
+        self.assertEqual(data['plant_name'], self.test_plant['name'])
+        self.assertEqual(data['plant_id'], plant_id)
 
 
 # Make the tests conveniently executable
