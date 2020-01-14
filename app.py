@@ -116,11 +116,15 @@ def create_app(test_config=None):
         # get id from kwargs
         id = kwargs['id']
 
+        # get plant by id
+        plant = Plant.query.filter_by(id=id).one_or_none()
+
+        # abort 404 if no plant found
+        if plant is None:
+            abort(404)
+
         # if PATCH
         if request.method == 'PATCH':
-
-            # get plant by id
-            plant = Plant.query.filter_by(id=id).one_or_none()
 
             # get request body
             body = request.get_json()
@@ -162,9 +166,6 @@ def create_app(test_config=None):
 
         # if DELETE
         if request.method == 'DELETE':
-
-            # get plant by id
-            plant = Plant.query.filter_by(id=id).one_or_none()
 
             # save plant name and id
             plant_name = plant.name
