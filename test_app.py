@@ -190,6 +190,34 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'unprocessable')
 
+    def test_patch_or_delete_plant_not_found(self):
+        """Tests 404 error for PATCH or DELETE plant"""
+
+        # get headers using ADMIN token
+        headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
+
+        # DELETE
+        # attempt to delete nonexisting plant and store response
+        response = self.client().delete('/plants/1000',
+                                        headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
+        # PATCH
+        # attempt to patch nonexisting plant and store response
+        response = self.client().patch('/plants/1000',
+                                       headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
     def test_delete_plant_success(self):
         """Tests DELETE plant success"""
 
@@ -206,7 +234,7 @@ class TriviaTestCase(unittest.TestCase):
         # get headers using ADMIN token
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
 
-        # delete the question and store response
+        # delete the plant and store response
         response = self.client().delete('/plants/{}'.format(plant_id),
                                         headers=headers)
         data = json.loads(response.data)
@@ -215,7 +243,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
 
-        # check if question and name match deleted plant
+        # check if plant and name match deleted plant
         self.assertEqual(data['plant_name'], self.test_plant['name'])
         self.assertEqual(data['plant_id'], plant_id)
 
