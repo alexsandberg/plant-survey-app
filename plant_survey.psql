@@ -132,7 +132,6 @@ COPY public."Observations" (id, name, date, plant_id, notes) FROM stdin;
 --
 
 COPY public."Plant" (id, name, latin_name, description, image_link) FROM stdin;
-19	test_plant	test_latin	test_description	test_image_link
 \.
 
 
