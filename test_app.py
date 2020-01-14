@@ -55,6 +55,8 @@ class TriviaTestCase(unittest.TestCase):
                 token
             )}
 
+    # PLANT tests
+
     # first test runs with empty database
     def test_get_plant_failure(self):
         """Tests GET plants failure"""
@@ -246,6 +248,20 @@ class TriviaTestCase(unittest.TestCase):
         # check if plant and name match deleted plant
         self.assertEqual(data['plant_name'], self.test_plant['name'])
         self.assertEqual(data['plant_id'], plant_id)
+
+    # OBSERVATION tests
+
+    def test_get_observations_failure(self):
+        """Tests GET observations failure"""
+
+        # get response and load data
+        response = self.client().get('/observations')
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
 
 
 # Make the tests conveniently executable
