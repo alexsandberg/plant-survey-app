@@ -32,6 +32,13 @@ class TriviaTestCase(unittest.TestCase):
             'imageLink': '3https://images.homedepot-static.com/productImages/4e5bb2e3-fc4f-494c-8652-c2850918199e/svn/bloomsz-flower-bulbs-07589-64_1000.jpg'
         }
 
+        # sample observation for use in tests
+        self.test_observation = {
+            'name': 'Alex Sandberg-Bernard',
+            'date': '2020-01-14 16:26:40.400770',
+            'notes': 'Sample notes'
+        }
+
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()
@@ -57,9 +64,17 @@ class TriviaTestCase(unittest.TestCase):
 
     # PLANT tests
 
-    # first test runs with empty database
     def test_get_plant_failure(self):
         """Tests GET plants failure"""
+
+        # get and delete any plants and observations in database
+        observations = Observation.query.all()
+        for observation in observations:
+            observation.delete()
+
+        plants = Plant.query.all()
+        for plant in plants:
+            plant.delete()
 
         # get response and load data
         response = self.client().get('/plants')
@@ -262,6 +277,37 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
+
+    def test_get_observations_success(self):
+        """Tests GET observations success"""
+
+        # create new plant for observation
+        plant = Plant(name=self.test_plant['name'],
+                      latin_name=self.test_plant['latinName'],
+                      description=self.test_plant['description'],
+                      image_link=self.test_plant['imageLink'])
+        plant.insert()
+
+        # get the id of the new plant
+        plant_id = plant.id
+
+        # create a new observation so database isn't empty
+        observation = Observation(name=self.test_observation['name'],
+                                  date=self.test_observation['date'],
+                                  plant_id=plant_id,
+                                  notes=self.test_observation['notes'])
+        observation.insert()
+
+        # get response and load data
+        response = self.client().get('/observations')
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+        # check that data returned for observations
+        self.assertTrue(data['observations'])
 
 
 # Make the tests conveniently executable
