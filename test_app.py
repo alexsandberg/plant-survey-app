@@ -309,6 +309,40 @@ class TriviaTestCase(unittest.TestCase):
         # check that data returned for observations
         self.assertTrue(data['observations'])
 
+    def test_post_observation_success(self):
+        """Tests POST observation success"""
+
+        # get headers using PUBLIC token
+        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+
+        # create new plant for observation
+        plant = Plant(name=self.test_plant['name'],
+                      latin_name=self.test_plant['latinName'],
+                      description=self.test_plant['description'],
+                      image_link=self.test_plant['imageLink'])
+        plant.insert()
+
+        # get the id of the new plant
+        plant_id = plant.id
+
+        # create a new observation json using plant
+        observation = {
+            'name': self.test_observation['name'],
+            'date': self.test_observation['date'],
+            'plantID': plant_id,
+            'notes': self.test_observation['notes']
+        }
+
+        # get response and load data
+        response = self.client().post('/observations',
+                                      json=observation,
+                                      headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
