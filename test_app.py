@@ -68,7 +68,27 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
 
-    # next test adds a plant
+    def test_get_plants(self):
+        """Tests GET plants success"""
+
+        # create a new plant so database isn't empty
+        plant = Plant(name=self.test_plant['name'],
+                      latin_name=self.test_plant['latinName'],
+                      description=self.test_plant['description'],
+                      image_link=self.test_plant['imageLink'])
+        plant.insert()
+
+        # get response and load data
+        response = self.client().get('/plants')
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+        # check that data returned for plants
+        self.assertTrue(data['plants'])
+
     def test_post_plant_success(self):
         """Tests POST new plant success"""
 
@@ -100,22 +120,18 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'unprocessable')
 
-    def test_get_plants(self):
-        """Tests GET plants success"""
-
-        # get response and load data
-        response = self.client().get('/plants')
-        data = json.loads(response.data)
-
-        # check status code and message
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['success'], True)
-
-        # check that data returned for plants
-        self.assertTrue(data['plants'])
-
     def test_patch_plant_success(self):
         """Tests PATCH plant success"""
+
+        # create a new plant to be updated
+        plant = Plant(name=self.test_plant['name'],
+                      latin_name=self.test_plant['latinName'],
+                      description=self.test_plant['description'],
+                      image_link=self.test_plant['imageLink'])
+        plant.insert()
+
+        # get the id of the new plant
+        plant_id = plant.id
 
         # get headers using ADMIN token
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
@@ -129,7 +145,8 @@ class TriviaTestCase(unittest.TestCase):
         }
 
         # get response with updated name json and load data
-        response = self.client().patch('/plants/19', json=request_data,
+        response = self.client().patch('/plants/{}'.format(plant_id),
+                                       json=request_data,
                                        headers=headers)
         data = json.loads(response.data)
 
@@ -140,6 +157,16 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_patch_plant_failure(self):
         """Tests PATCH plant failure"""
+
+        # create a new plant to be updated
+        plant = Plant(name=self.test_plant['name'],
+                      latin_name=self.test_plant['latinName'],
+                      description=self.test_plant['description'],
+                      image_link=self.test_plant['imageLink'])
+        plant.insert()
+
+        # get the id of the new plant
+        plant_id = plant.id
 
         # get headers using ADMIN token
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
@@ -153,7 +180,8 @@ class TriviaTestCase(unittest.TestCase):
         }
 
         # get response with malformed json and load data
-        response = self.client().patch('/plants/19', json=request_data,
+        response = self.client().patch('/plants/{}'.format(plant_id),
+                                       json=request_data,
                                        headers=headers)
         data = json.loads(response.data)
 
