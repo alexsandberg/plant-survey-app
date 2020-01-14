@@ -125,6 +125,15 @@ def create_app(test_config=None):
             # get request body
             body = request.get_json()
 
+            # get all keys from request body
+            body_keys = []
+            for key in body:
+                body_keys.append(key)
+
+            # make sure correct keys are present
+            if sorted(body_keys) != sorted(['name', 'latinName', 'description', 'imageLink']):
+                abort(422)
+
             # update plant with data from body
             if body.get('name'):
                 plant.name = body.get('name')

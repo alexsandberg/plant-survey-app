@@ -120,8 +120,16 @@ class TriviaTestCase(unittest.TestCase):
         # get headers using ADMIN token
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
 
+        # set json data
+        data = {
+            'name': 'PATCH TEST',
+            'latinName': None,
+            'description': None,
+            'imageLink': None
+        }
+
         # get response with updated name json and load data
-        response = self.client().patch('/plants/19', json={'name': 'PATCH TEST'},
+        response = self.client().patch('/plants/19', json=data,
                                        headers=headers)
         data = json.loads(response.data)
 
@@ -129,6 +137,30 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertEqual(data['plant']['name'], 'PATCH TEST')
+
+    def test_patch_plant_failure(self):
+        """Tests PATCH plant failure"""
+
+        # get headers using ADMIN token
+        headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
+
+        # set malformed json data
+        data = {
+            'nome': 'PATCH TEST',
+            'latinName': None,
+            'description': None,
+            'imageLink': None
+        }
+
+        # get response with malformed json and load data
+        response = self.client().patch('/plants/19', json=data,
+                                       headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'unprocessable')
 
 
 # Make the tests conveniently executable
