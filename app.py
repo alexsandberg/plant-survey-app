@@ -297,6 +297,10 @@ def create_app(test_config=None):
         # if DELETE
         if request.method == 'DELETE':
 
+            # save observation name and id
+            observation_name = observation.name
+            observation_id = observation.id
+
             try:
                 # delete observation from the database
                 observation.delete()
@@ -306,7 +310,9 @@ def create_app(test_config=None):
 
             # return success
             return jsonify({
-                "success": True
+                "success": True,
+                "observation_name": observation_name,
+                "observation_id": observation_id
             })
 
     # Error Handling
