@@ -15,6 +15,21 @@ class TriviaTestCase(unittest.TestCase):
     ADMIN_ROLE_TOKEN = os.environ.get('ADMIN_ROLE_TOKEN')
     PUBLIC_ROLE_TOKEN = os.environ.get('PUBLIC_ROLE_TOKEN')
 
+    # sample plant for use in tests
+    test_plant = {
+        'name': 'Green whispy daffodil',
+        'latinName': 'Veritus daffodilius',
+        'description': 'Completely real plant that really exists, I promise.',
+        'imageLink': '3https://images.homedepot-static.com/productImages/4e5bb2e3-fc4f-494c-8652-c2850918199e/svn/bloomsz-flower-bulbs-07589-64_1000.jpg'
+    }
+
+    # sample observation for use in tests
+    test_observation = {
+        'name': 'Alex Sandberg-Bernard',
+        'date': '2020-01-14 16:26:40.400770',
+        'notes': 'Seen in Boulder on Mesa Trail'
+    }
+
     def setUp(self):
         """Define test variables and initialize app."""
         self.app = create_app()
@@ -23,21 +38,6 @@ class TriviaTestCase(unittest.TestCase):
         self.database_path = "postgres://{}/{}".format(
             'localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
-
-        # sample plant for use in tests
-        self.test_plant = {
-            'name': 'Green whispy daffodil',
-            'latinName': 'Veritus daffodilius',
-            'description': 'Completely real plant that really exists, I promise.',
-            'imageLink': '3https://images.homedepot-static.com/productImages/4e5bb2e3-fc4f-494c-8652-c2850918199e/svn/bloomsz-flower-bulbs-07589-64_1000.jpg'
-        }
-
-        # sample observation for use in tests
-        self.test_observation = {
-            'name': 'Alex Sandberg-Bernard',
-            'date': '2020-01-14 16:26:40.400770',
-            'notes': 'Sample notes'
-        }
 
         # binds the app to the current context
         with self.app.app_context():
@@ -50,23 +50,40 @@ class TriviaTestCase(unittest.TestCase):
         """Executed after reach test"""
         pass
 
-    def create_auth_headers(*args, **kwargs):
+    # UTILITY METHODS
 
-        # get token
-        token = kwargs['token']
-
-        # return auth headers
+    # creates auth header with bearer token
+    def create_auth_headers(self, token):
+        # return auth headers using token
         return {
             "Authorization": "Bearer {}".format(
-                # base64.b64encode()
                 token
             )}
 
-    # PLANT tests
+    # creates test plant
+    def create_test_plant(self):
+        # create and insert new plant
+        plant = Plant(name=self.test_plant['name'],
+                      latin_name=self.test_plant['latinName'],
+                      description=self.test_plant['description'],
+                      image_link=self.test_plant['imageLink'])
+        plant.insert()
 
-    def test_get_plant_failure(self):
-        """Tests GET plants failure"""
+        return plant.id
 
+    # creates new test observation
+    def create_test_observation(self, plant_id):
+        # create and insert new observation
+        observation = Observation(name=self.test_observation['name'],
+                                  date=self.test_observation['date'],
+                                  plant_id=plant_id,
+                                  notes=self.test_observation['notes'])
+        observation.insert()
+
+        return observation.id
+
+    # deletes all entries from database
+    def clear_database(self):
         # get and delete any plants and observations in database
         observations = Observation.query.all()
         for observation in observations:
@@ -75,6 +92,14 @@ class TriviaTestCase(unittest.TestCase):
         plants = Plant.query.all()
         for plant in plants:
             plant.delete()
+
+    # PLANT tests
+
+    def test_get_plant_failure(self):
+        """Tests GET plants failure"""
+
+        # ensure database is empty
+        self.clear_database()
 
         # get response and load data
         response = self.client().get('/plants')
@@ -88,12 +113,8 @@ class TriviaTestCase(unittest.TestCase):
     def test_get_plants(self):
         """Tests GET plants success"""
 
-        # create a new plant so database isn't empty
-        plant = Plant(name=self.test_plant['name'],
-                      latin_name=self.test_plant['latinName'],
-                      description=self.test_plant['description'],
-                      image_link=self.test_plant['imageLink'])
-        plant.insert()
+        # create a new plant to ensure database isn't empty
+        self.create_test_plant()
 
         # get response and load data
         response = self.client().get('/plants')
@@ -140,15 +161,8 @@ class TriviaTestCase(unittest.TestCase):
     def test_patch_plant_success(self):
         """Tests PATCH plant success"""
 
-        # create a new plant to be updated
-        plant = Plant(name=self.test_plant['name'],
-                      latin_name=self.test_plant['latinName'],
-                      description=self.test_plant['description'],
-                      image_link=self.test_plant['imageLink'])
-        plant.insert()
-
-        # get the id of the new plant
-        plant_id = plant.id
+        # create a new plant to be updated and store plant id
+        plant_id = self.create_test_plant()
 
         # get headers using ADMIN token
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
@@ -175,15 +189,8 @@ class TriviaTestCase(unittest.TestCase):
     def test_patch_plant_failure(self):
         """Tests PATCH plant failure"""
 
-        # create a new plant to be updated
-        plant = Plant(name=self.test_plant['name'],
-                      latin_name=self.test_plant['latinName'],
-                      description=self.test_plant['description'],
-                      image_link=self.test_plant['imageLink'])
-        plant.insert()
-
-        # get the id of the new plant
-        plant_id = plant.id
+        # create a new plant to be updated and store plant id
+        plant_id = self.create_test_plant()
 
         # get headers using ADMIN token
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
@@ -238,15 +245,8 @@ class TriviaTestCase(unittest.TestCase):
     def test_delete_plant_success(self):
         """Tests DELETE plant success"""
 
-        # create a new plant to be deleted
-        plant = Plant(name=self.test_plant['name'],
-                      latin_name=self.test_plant['latinName'],
-                      description=self.test_plant['description'],
-                      image_link=self.test_plant['imageLink'])
-        plant.insert()
-
-        # get the id of the new plant
-        plant_id = plant.id
+        # create a new plant to be deleted and store plant id
+        plant_id = self.create_test_plant()
 
         # get headers using ADMIN token
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
@@ -269,6 +269,9 @@ class TriviaTestCase(unittest.TestCase):
     def test_get_observations_failure(self):
         """Tests GET observations failure"""
 
+        # ensure database is empty
+        self.clear_database()
+
         # get response and load data
         response = self.client().get('/observations')
         data = json.loads(response.data)
@@ -281,22 +284,13 @@ class TriviaTestCase(unittest.TestCase):
     def test_get_observations_success(self):
         """Tests GET observations success"""
 
-        # create new plant for observation
-        plant = Plant(name=self.test_plant['name'],
-                      latin_name=self.test_plant['latinName'],
-                      description=self.test_plant['description'],
-                      image_link=self.test_plant['imageLink'])
-        plant.insert()
+        # ensure database is not empty by adding a plant and observation
 
-        # get the id of the new plant
-        plant_id = plant.id
+        # create a new plant and store plant id
+        plant_id = self.create_test_plant()
 
-        # create a new observation so database isn't empty
-        observation = Observation(name=self.test_observation['name'],
-                                  date=self.test_observation['date'],
-                                  plant_id=plant_id,
-                                  notes=self.test_observation['notes'])
-        observation.insert()
+        # create and insert new observation using plant id
+        self.create_test_observation(plant_id)
 
         # get response and load data
         response = self.client().get('/observations')
@@ -316,16 +310,9 @@ class TriviaTestCase(unittest.TestCase):
         headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
 
         # create new plant for observation
-        plant = Plant(name=self.test_plant['name'],
-                      latin_name=self.test_plant['latinName'],
-                      description=self.test_plant['description'],
-                      image_link=self.test_plant['imageLink'])
-        plant.insert()
+        plant_id = self.create_test_plant()
 
-        # get the id of the new plant
-        plant_id = plant.id
-
-        # create a new observation json using plant
+        # create a new observation json using test plant
         observation = {
             'name': self.test_observation['name'],
             'date': self.test_observation['date'],
@@ -349,16 +336,10 @@ class TriviaTestCase(unittest.TestCase):
         # get headers using PUBLIC token
         headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
 
-        # create a new observation json with missing plant_id
-        observation = {
-            'name': self.test_observation['name'],
-            'date': self.test_observation['date'],
-            'notes': self.test_observation['notes']
-        }
-
+        # send request using test_observation, which is missing plant_id
         # get response and load data
         response = self.client().post('/observations',
-                                      json=observation,
+                                      json=self.test_observation,
                                       headers=headers)
         data = json.loads(response.data)
 
