@@ -348,6 +348,38 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'unprocessable')
 
+    def test_patch_observation_success(self):
+        """Tests PATCH observation success"""
+
+        # create a new plant and store plant id
+        plant_id = self.create_test_plant()
+
+        # create and insert new observation using plant id
+        observation_id = self.create_test_observation(plant_id)
+
+        # get headers using PUBLIC token
+        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+
+        # set json data for observation patch with updated name
+        request_data = {
+            'name': 'PATCH TEST',
+            'date': None,
+            'plantID': plant_id,
+            'notes': None
+        }
+
+        # get response with updated name json and load data
+        response = self.client().patch('/observations/{}'
+                                       .format(observation_id),
+                                       json=request_data,
+                                       headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['observation']['name'], 'PATCH TEST')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
