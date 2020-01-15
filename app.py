@@ -252,6 +252,10 @@ def create_app(test_config=None):
         # get observation by id
         observation = Observation.query.filter_by(id=id).one_or_none()
 
+        # abort 404 if no observation found
+        if observation is None:
+            abort(404)
+
         # if PATCH
         if request.method == 'PATCH':
 

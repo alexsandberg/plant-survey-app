@@ -442,6 +442,34 @@ class PlantTestCase(unittest.TestCase):
                          self.test_observation['name'])
         self.assertEqual(data['observation_id'], observation_id)
 
+    def test_patch_or_delete_observation_not_found(self):
+        """Tests 404 not found error for PATCH or DELETE observation"""
+
+        # get headers using PUBLIC token
+        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+
+        # DELETE
+        # attempt to delete nonexisting observation and store response
+        response = self.client().delete('/observations/1000',
+                                        headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
+        # PATCH
+        # attempt to patch nonexisting observation and store response
+        response = self.client().patch('/observations/1000',
+                                       headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
