@@ -1,5 +1,5 @@
 import os
-import base64
+import datetime
 import unittest
 import json
 from flask_sqlalchemy import SQLAlchemy
@@ -8,27 +8,12 @@ from app import create_app
 from models import setup_db, Plant, Observation
 
 
-class TriviaTestCase(unittest.TestCase):
-    """This class represents the trivia test case"""
+class PlantTestCase(unittest.TestCase):
+    """This class represents the plant survey test case"""
 
     # auth tokens needed for successful testing
     ADMIN_ROLE_TOKEN = os.environ.get('ADMIN_ROLE_TOKEN')
     PUBLIC_ROLE_TOKEN = os.environ.get('PUBLIC_ROLE_TOKEN')
-
-    # sample plant for use in tests
-    test_plant = {
-        'name': 'Green whispy daffodil',
-        'latinName': 'Veritus daffodilius',
-        'description': 'Completely real plant that really exists, I promise.',
-        'imageLink': '3https://images.homedepot-static.com/productImages/4e5bb2e3-fc4f-494c-8652-c2850918199e/svn/bloomsz-flower-bulbs-07589-64_1000.jpg'
-    }
-
-    # sample observation for use in tests
-    test_observation = {
-        'name': 'Alex Sandberg-Bernard',
-        'date': '2020-01-14 16:26:40.400770',
-        'notes': 'Seen in Boulder on Mesa Trail'
-    }
 
     def setUp(self):
         """Define test variables and initialize app."""
@@ -92,6 +77,25 @@ class TriviaTestCase(unittest.TestCase):
         plants = Plant.query.all()
         for plant in plants:
             plant.delete()
+
+    # generates random string
+    def gen_random_string():
+        return str(os.urandom(10))
+
+    # sample plant for use in tests
+    test_plant = {
+        'name': gen_random_string(),
+        'latinName': gen_random_string(),
+        'description': gen_random_string(),
+        'imageLink': gen_random_string()
+    }
+
+    # sample observation for use in tests
+    test_observation = {
+        'name': gen_random_string(),
+        'date': datetime.datetime.now(),
+        'notes': gen_random_string()
+    }
 
     # PLANT tests
 
