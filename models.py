@@ -3,7 +3,8 @@ from sqlalchemy import Column, String, Integer, Float, create_engine
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-database_path = 'postgres://alex@localhost:5432/plant_survey_test'
+
+database_path = os.environ['DATABASE_URL']
 
 db = SQLAlchemy()
 
