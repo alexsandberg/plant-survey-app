@@ -249,11 +249,11 @@ def create_app(test_config=None):
         # get id from kwargs
         id = kwargs['id']
 
+        # get observation by id
+        observation = Observation.query.filter_by(id=id).one_or_none()
+
         # if PATCH
         if request.method == 'PATCH':
-
-            # get observation by id
-            observation = Observation.query.filter_by(id=id).one_or_none()
 
             # get request body
             body = request.get_json()
@@ -296,9 +296,6 @@ def create_app(test_config=None):
 
         # if DELETE
         if request.method == 'DELETE':
-
-            # get observation by id
-            observation = Observation.query.filter_by(id=id).one_or_none()
 
             try:
                 # delete observation from the database
