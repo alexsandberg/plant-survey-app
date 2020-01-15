@@ -343,6 +343,30 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
 
+    def test_post_observation_failure(self):
+        """Tests POST observation failure"""
+
+        # get headers using PUBLIC token
+        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+
+        # create a new observation json with missing plant_id
+        observation = {
+            'name': self.test_observation['name'],
+            'date': self.test_observation['date'],
+            'notes': self.test_observation['notes']
+        }
+
+        # get response and load data
+        response = self.client().post('/observations',
+                                      json=observation,
+                                      headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'unprocessable')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
