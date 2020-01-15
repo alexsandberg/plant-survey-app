@@ -34,7 +34,9 @@ def create_app(test_config=None):
     @app.route('/')
     def index():
         # TODO build frontend
-        pass
+        return jsonify({
+            'TODO': 'Build a frontend :)'
+        })
 
     @app.route('/plants')
     def plants():
