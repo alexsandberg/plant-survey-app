@@ -470,6 +470,24 @@ class PlantTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
 
+    # AUTH tests
+
+    def test_permission_not_found(self):
+        """Tests AuthError – permission not found"""
+
+        # get headers using PUBLIC token
+        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+
+        # attempt to post new plant (requires Admin role)
+        response = self.client().post('/plants/new', json=self.test_plant,
+                                      headers=headers)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(data['code'], 'unauthorized')
+        self.assertEqual(data['description'], 'Permission not found.')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
