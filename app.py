@@ -1,4 +1,3 @@
-import os
 from flask import Flask, request, abort, jsonify, render_template, redirect
 from models import setup_db
 from flask_cors import CORS
@@ -34,6 +33,7 @@ def create_app(test_config=None):
     @app.route('/')
     def index():
         # TODO build frontend
+        # homepage will have links for login, /plants and /observations
         return jsonify({
             'TODO': 'Build a frontend :)'
         })
@@ -76,7 +76,7 @@ def create_app(test_config=None):
             'plants': plants_formatted
         })
 
-    @app.route('/plants/new', methods=['POST'])
+    @app.route('/plants', methods=['POST'])
     @requires_auth('post:plants')
     def new_plant(jwt):
 
