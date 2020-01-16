@@ -35,7 +35,7 @@ Developers using this project should already have Python3 and pip installed.
 
 Once you have cloned this project and your virtual environment setup and running, install dependencies by naviging to the root directory and running:
 
-```bash
+```
 pip install -r requirements.txt
 ```
 
@@ -44,7 +44,7 @@ pip install -r requirements.txt
 From within the root directory first ensure you are working using your created virtual environment.
 
 To set up the database, execute:
-```bash
+```
 dropdb plant_survey
 createdb plant_survey
 psql plant_survey < plant_survey.psql
@@ -52,7 +52,7 @@ psql plant_survey < plant_survey.psql
 
 To run the development server, execute:
 
-```bash
+```
 export DATABASE_URL=<local_database_path>
 export FLASK_ENV=development
 python3 app.py
@@ -60,7 +60,7 @@ python3 app.py
 
 ## Testing
 To run the tests, run
-```bash
+```
 export ADMIN_ROLE_TOKEN=<active_admin_jwt>
 export PUBLIC_ROLE_TOKEN=<active_public_jwt>
 dropdb plant_survey_test
@@ -87,7 +87,7 @@ Errors are returned as JSON in the following format:<br>
         "message": "resource not found"
     }
 
-The API will return three types of errors:
+The API will return the following types of errors:
 
 * 400 – bad request
 * 401 – unauthorized
