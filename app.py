@@ -1,4 +1,4 @@
-from flask import Flask, request, abort, jsonify, render_template, redirect
+from flask import Flask, request, abort, jsonify
 from models import setup_db
 from flask_cors import CORS
 
@@ -8,6 +8,7 @@ from auth.auth import AuthError, requires_auth
 
 def create_app(test_config=None):
 
+    # set up Flask app
     app = Flask(__name__)
     setup_db(app)
 
@@ -40,6 +41,9 @@ def create_app(test_config=None):
 
     @app.route('/plants')
     def plants():
+        '''
+        Handles GET requests for getting all plants.
+        '''
 
         # get all plants from database
         plants = Plant.query.all()
@@ -79,6 +83,9 @@ def create_app(test_config=None):
     @app.route('/plants', methods=['POST'])
     @requires_auth('post:plants')
     def new_plant(jwt):
+        '''
+        Handles POST requests for adding new plant.
+        '''
 
         # load the request body
         body = request.get_json()
@@ -114,6 +121,9 @@ def create_app(test_config=None):
     @app.route('/plants/<int:id>', methods=['PATCH', 'DELETE'])
     @requires_auth('edit_or_delete:plants')
     def edit_or_delete_plant(*args, **kwargs):
+        '''
+        Handles PATCH and DELETE requests for plants.
+        '''
 
         # get id from kwargs
         id = kwargs['id']
@@ -190,6 +200,9 @@ def create_app(test_config=None):
 
     @app.route('/observations')
     def get_plant_observations():
+        '''
+        Handles GET requests for getting all observations.
+        '''
 
         # get all plant observations
         observations = Observation.query.all()
@@ -213,6 +226,10 @@ def create_app(test_config=None):
     @app.route('/observations', methods=['POST'])
     @requires_auth('post:observations')
     def post_plant_observation(jwt):
+        '''
+        Handles POST requests for adding new observation.
+        '''
+
         # load the request body
         body = request.get_json()
 
@@ -247,6 +264,9 @@ def create_app(test_config=None):
     @app.route('/observations/<int:id>', methods=['PATCH', 'DELETE'])
     @requires_auth('edit_or_delete:observations')
     def edit_or_delete_observation(*args, **kwargs):
+        '''
+        Handles PATCH and DELETE requests for observations.
+        '''
 
         # get id from kwargs
         id = kwargs['id']

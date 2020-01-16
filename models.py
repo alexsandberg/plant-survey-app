@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import Column, String, Integer, Float, create_engine
+from sqlalchemy import Column, String, Integer
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
