@@ -488,6 +488,19 @@ class PlantTestCase(unittest.TestCase):
         self.assertEqual(data['code'], 'unauthorized')
         self.assertEqual(data['description'], 'Permission not found.')
 
+    def test_auth_header_missing(self):
+        """Tests AuthError - auth header missing"""
+
+        # attempt to post new plant without auth header
+        response = self.client().post('/plants/new', json=self.test_plant)
+        data = json.loads(response.data)
+
+        # check status code and message
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(data['code'], 'authorization_header_missing')
+        self.assertEqual(data['description'],
+                         'Authorization header is expected.')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
