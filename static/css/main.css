@@ -20,7 +20,8 @@ h1 {
     margin-right: auto;
 }
 
-.post {
+.post,
+.plant-post {
     background-color: #fff;
     border: 2px solid #f3f3f3;
     padding: 20px;
@@ -30,6 +31,10 @@ h1 {
     margin: 1.2em;
     max-width: 400px;
     transition: background-color .5s;
+}
+
+.plant-post img {
+    width: 100%
 }
 
 .post:hover {

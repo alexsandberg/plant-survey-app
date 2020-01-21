@@ -3,11 +3,12 @@
 {% block content %}
 <div class="posts-container">
     {% for plant in plants %}
-    <div class="post">
+    <div class="plant-post">
         <p>{{ plant.name }}</p>
         <p>{{ plant.latin_name }}</p>
         <p>{{ plant.description }}</p>
-        <p>{{ plant.image_link }}</p>
+        <img src="{{ plant.image_link }}" alt="Plant Image" />
+        <!-- <p>{{ plant.image_link }}</p> -->
     </div>
     {% endfor %}
 </div>
