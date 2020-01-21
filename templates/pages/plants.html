@@ -1,0 +1,14 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Plants{% endblock %}
+{% block content %}
+<div class="posts-container">
+    {% for plant in plants %}
+    <div class="post">
+        <p>{{ plant.name }}</p>
+        <p>{{ plant.latin_name }}</p>
+        <p>{{ plant.description }}</p>
+        <p>{{ plant.image_link }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

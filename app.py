@@ -72,10 +72,13 @@ def create_app(test_config=None):
             plants_formatted.append(plant)
 
         # return plants
-        return jsonify({
-            'success': True,
-            'plants': plants_formatted
-        })
+        return render_template('pages/plants.html',
+                               plants=plants_formatted), 200
+        # return plants
+        # return jsonify({
+        #     'success': True,
+        #     'plants': plants_formatted
+        # })
 
     @app.route('/plants', methods=['POST'])
     @requires_auth('post:plants')
