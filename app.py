@@ -1,4 +1,4 @@
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, render_template, redirect, url_for
 from models import setup_db
 from flask_cors import CORS
 
@@ -33,11 +33,8 @@ def create_app(test_config=None):
     # home page route handler
     @app.route('/')
     def index():
-        # TODO build frontend
-        # homepage will have links for login, /plants and /observations
-        return jsonify({
-            'TODO': 'Build a frontend :)'
-        })
+        # redirct to /observations
+        return redirect(url_for('get_plant_observations'))
 
     @app.route('/plants')
     def plants():
@@ -213,15 +210,17 @@ def create_app(test_config=None):
 
         observations_formatted = []
 
-        # format each plant
+        # format each observation
         for observation in observations:
             observations_formatted.append(observation.format())
 
-        # return plants
-        return jsonify({
-            'success': True,
-            'observations': observations_formatted
-        })
+        # return observations
+        return render_template('pages/observations.html',
+                               observations=observations_formatted), 200
+        # return jsonify({
+        #     'success': True,
+        #     'observations': observations_formatted
+        # })
 
     @app.route('/observations', methods=['POST'])
     @requires_auth('post:observations')

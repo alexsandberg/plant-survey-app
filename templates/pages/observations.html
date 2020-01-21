@@ -1,0 +1,14 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Observations{% endblock %}
+{% block content %}
+<div class="posts-container">
+    {% for observation in observations %}
+    <div class="post">
+        <p>{{ observation.name }}</p>
+        <p>{{ observation.date }}</p>
+        <p>{{ observation.plant_id }}</p>
+        <p>{{ observation.notes }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
