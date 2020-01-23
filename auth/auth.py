@@ -1,15 +1,17 @@
 import json
+import os
 from flask import request
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
 
-AUTH0_DOMAIN = 'plant-survey.auth0.com'
-ALGORITHMS = ['RS256']
-API_AUDIENCE = 'plant'
-CLIENT_ID = 'qCCRVfaBNp1U2gMaYeasqOyRLJG6GU4v'
-CALLBACK_URL = 'http://127.0.0.1:5000/'
+AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
+ALGORITHMS = os.getenv('ALGORITHMS')
+API_AUDIENCE = os.getenv('API_AUDIENCE')
+CLIENT_ID = os.getenv('CLIENT_ID')
+CALLBACK_URL = os.getenv('CALLBACK_URL')
+
 
 # AuthError Exception
 '''

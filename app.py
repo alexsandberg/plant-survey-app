@@ -1,12 +1,18 @@
 from flask import Flask, request, abort, jsonify, render_template, redirect, url_for
 from models import setup_db
 from flask_cors import CORS
+from dotenv import load_dotenv, find_dotenv
 
 from models import Plant, Observation
 from auth.auth import AuthError, requires_auth, create_login_link
 
 
 def create_app(test_config=None):
+
+    # set up environment variables using dotenv
+    ENV_FILE = find_dotenv()
+    if ENV_FILE:
+        load_dotenv(ENV_FILE)
 
     # set up Flask app
     app = Flask(__name__)
