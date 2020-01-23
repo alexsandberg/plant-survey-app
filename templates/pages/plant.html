@@ -1,14 +1,10 @@
 {% extends 'layouts/main.html' %}
-{% block title %}Plants{% endblock %}
 {% block content %}
-<div class="posts-container">
-    {% for plant in plants %}
-    <div class="plant-post">
 
+<div class="posts-container">
+    <div class="plant-post">
         <div class="post-text-container">
-            <a href="/plants/{{ plant.id }}">
-                <h3>{{ plant.name }}</h3>
-            </a>
+            <h3>{{ plant.name }}</h3>
             <p>{{ plant.latin_name }}</p>
             <p>{{ plant.description }}</p>
             <div class="post-observations">
@@ -20,12 +16,11 @@
             </div>
         </div>
 
-
         <div class="post-img-container">
-            <a href="/plants/{{ plant.id }}"><img src="{{ plant.image_link }}" alt="Plant Image" /></a>
+            <img src="{{ plant.image_link }}" alt="Plant Image" />
         </div>
         <!-- <p>{{ plant.image_link }}</p> -->
     </div>
-    {% endfor %}
 </div>
+
 {% endblock %}

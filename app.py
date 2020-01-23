@@ -80,6 +80,22 @@ def create_app(test_config=None):
         #     'plants': plants_formatted
         # })
 
+    @app.route('/plants/<int:id>')
+    def get_plant_by_id(*args, **kwargs):
+        # get id from kwargs
+        id = kwargs['id']
+
+        # get plant by id
+        plant = Plant.query.filter_by(id=id).one_or_none()
+
+        # abort 404 if no plant found
+        if plant is None:
+            abort(404)
+
+        # serve plant page with formatted plant
+        return render_template('pages/plant.html',
+                               plant=plant.format()), 200
+
     @app.route('/plants', methods=['POST'])
     @requires_auth('post:plants')
     def new_plant(jwt):
