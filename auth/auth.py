@@ -8,6 +8,8 @@ from urllib.request import urlopen
 AUTH0_DOMAIN = 'plant-survey.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'plant'
+CLIENT_ID = 'qCCRVfaBNp1U2gMaYeasqOyRLJG6GU4v'
+CALLBACK_URL = 'http://127.0.0.1:5000/'
 
 # AuthError Exception
 '''
@@ -175,3 +177,14 @@ def requires_auth(permission=''):
 
         return wrapper
     return requires_auth_decorator
+
+
+def create_login_link():
+    link = 'https://'
+    link += AUTH0_DOMAIN
+    link += '/authorize?'
+    link += 'audience=' + API_AUDIENCE + '&'
+    link += 'response_type=token&'
+    link += 'client_id=' + CLIENT_ID + '&'
+    link += 'redirect_uri=' + CALLBACK_URL
+    return link

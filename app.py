@@ -3,7 +3,7 @@ from models import setup_db
 from flask_cors import CORS
 
 from models import Plant, Observation
-from auth.auth import AuthError, requires_auth
+from auth.auth import AuthError, requires_auth, create_login_link
 
 
 def create_app(test_config=None):
@@ -33,8 +33,11 @@ def create_app(test_config=None):
     # home page route handler
     @app.route('/')
     def index():
-        # redirct to /observations
-        return redirect(url_for('get_plant_observations'))
+
+        # add login link function to jinja context
+        app.jinja_env.globals.update(create_login_link=create_login_link)
+
+        return render_template('pages/home.html'), 200
 
     @app.route('/plants')
     def plants():
