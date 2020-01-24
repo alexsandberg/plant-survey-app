@@ -8,9 +8,9 @@ from urllib.request import urlopen
 
 AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
 ALGORITHMS = os.getenv('ALGORITHMS')
-API_AUDIENCE = os.getenv('API_AUDIENCE')
-CLIENT_ID = os.getenv('CLIENT_ID')
-CALLBACK_URL = os.getenv('CALLBACK_URL')
+AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE')
+AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
+AUTH0_CALLBACK_URL = os.getenv('AUTH0_CALLBACK_URL')
 
 
 # AuthError Exception
@@ -130,7 +130,7 @@ def verify_decode_jwt(token):
                 token,
                 rsa_key,
                 algorithms=ALGORITHMS,
-                audience=API_AUDIENCE,
+                audience=AUTH0_AUDIENCE,
                 issuer='https://' + AUTH0_DOMAIN + '/'
             )
 
@@ -185,8 +185,8 @@ def create_login_link():
     link = 'https://'
     link += AUTH0_DOMAIN
     link += '/authorize?'
-    link += 'audience=' + API_AUDIENCE + '&'
+    link += 'audience=' + AUTH0_AUDIENCE + '&'
     link += 'response_type=token&'
-    link += 'client_id=' + CLIENT_ID + '&'
-    link += 'redirect_uri=' + CALLBACK_URL
+    link += 'AUTH0_CLIENT_ID=' + AUTH0_CLIENT_ID + '&'
+    link += 'redirect_uri=' + AUTH0_CALLBACK_URL
     return link
