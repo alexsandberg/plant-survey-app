@@ -1,10 +1,14 @@
-from flask import Flask, request, abort, jsonify, render_template, redirect, url_for
+from flask import Flask, request, abort, jsonify, render_template, redirect, url_for, session
+import json
 from models import setup_db
 from flask_cors import CORS
-from dotenv import load_dotenv, find_dotenv
-
+from os import environ as env
+from authlib.integrations.flask_client import OAuth
+from six.moves.urllib.parse import urlencode
 from models import Plant, Observation
 from auth.auth import AuthError, requires_auth, create_login_link
+import constants
+from dotenv import load_dotenv, find_dotenv
 
 
 def create_app(test_config=None):
@@ -14,9 +18,32 @@ def create_app(test_config=None):
     if ENV_FILE:
         load_dotenv(ENV_FILE)
 
+    # set up Auth0
+    AUTH0_CALLBACK_URL = env.get(constants.AUTH0_CALLBACK_URL)
+    AUTH0_CLIENT_ID = env.get(constants.AUTH0_CLIENT_ID)
+    AUTH0_CLIENT_SECRET = env.get(constants.AUTH0_CLIENT_SECRET)
+    AUTH0_DOMAIN = env.get(constants.AUTH0_DOMAIN)
+    AUTH0_BASE_URL = 'https://' + AUTH0_DOMAIN
+    AUTH0_AUDIENCE = env.get(constants.AUTH0_AUDIENCE)
+
     # set up Flask app
     app = Flask(__name__)
     setup_db(app)
+    app.secret_key = constants.SECRET_KEY
+
+    # set up OAuth
+    oauth = OAuth(app)
+    auth0 = oauth.register(
+        'auth0',
+        client_id=AUTH0_CLIENT_ID,
+        client_secret=AUTH0_CLIENT_SECRET,
+        api_base_url=AUTH0_BASE_URL,
+        access_token_url=AUTH0_BASE_URL + '/oauth/token',
+        authorize_url=AUTH0_BASE_URL + '/authorize',
+        client_kwargs={
+            'scope': 'openid profile email',
+        },
+    )
 
     # set up CORS, allowing all origins
     CORS(app, resources={'/': {'origins': '*'}})
@@ -32,13 +59,47 @@ def create_app(test_config=None):
                              'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
+    # AUTH ROUTES -- AUTH0 BOILERPLATE
+
+    @app.route('/callback')
+    def callback_handling():
+        auth0.authorize_access_token()
+        resp = auth0.get('userinfo')
+        userinfo = resp.json()
+
+        session[constants.JWT_PAYLOAD] = userinfo
+        session[constants.PROFILE_KEY] = {
+            'user_id': userinfo['sub'],
+            'name': userinfo['name'],
+            'picture': userinfo['picture']
+        }
+        return redirect('/dashboard')
+
+    @app.route('/login')
+    def login():
+        return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL,
+                                        audience=AUTH0_AUDIENCE)
+
+    @app.route('/logout')
+    def logout():
+        session.clear()
+        params = {'returnTo': url_for(
+            'home', _external=True), 'client_id': AUTH0_CLIENT_ID}
+        return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
+
+    @app.route('/dashboard')
+    def dashboard():
+        return render_template('/pages/dashboard.html',
+                               userinfo=session[constants.PROFILE_KEY],
+                               userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4))
+
     # ------------------------------------
     # ROUTES
     # ------------------------------------
 
     # home page route handler
     @app.route('/')
-    def index():
+    def home():
 
         # add login link function to jinja context
         app.jinja_env.globals.update(create_login_link=create_login_link)
@@ -50,6 +111,8 @@ def create_app(test_config=None):
         '''
         Handles GET requests for getting all plants.
         '''
+
+        print('SESSION: ', session['jwt_payload']['email'])
 
         # get all plants from database
         plants = Plant.query.all()

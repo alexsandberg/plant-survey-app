@@ -1,4 +1,20 @@
 {% extends 'layouts/main.html' %}
 {% block content %}
-<button onclick="window.location.href = '{{ create_login_link() }}';">Click Here</button>
+<!-- <button onclick="window.location.href = '{{ create_login_link() }}';">Login</button>
+
+<script>
+
+    var token = localStorage.getItem('token');
+    console.log("TOKEN: ", token)
+
+</script> -->
+
+<div class="container">
+    <div class="login-page clearfix">
+        <div class="login-box auth0-box before">
+            <a id="qsLoginBtn" class="btn btn-primary btn-lg btn-login btn-block" href="/login">Log In</a>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
