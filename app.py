@@ -59,10 +59,6 @@ def create_app(test_config=None):
                              'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
-    # ------------------------------------
-    # ROUTES
-    # ------------------------------------
-
     # AUTH ROUTES -- AUTH0 BOILERPLATE
 
     @app.route('/callback')
@@ -81,7 +77,8 @@ def create_app(test_config=None):
 
     @app.route('/login')
     def login():
-        return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
+        return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL,
+                                        audience=AUTH0_AUDIENCE)
 
     @app.route('/logout')
     def logout():
@@ -95,6 +92,10 @@ def create_app(test_config=None):
         return render_template('/pages/dashboard.html',
                                userinfo=session[constants.PROFILE_KEY],
                                userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4))
+
+    # ------------------------------------
+    # ROUTES
+    # ------------------------------------
 
     # home page route handler
     @app.route('/')
@@ -110,6 +111,8 @@ def create_app(test_config=None):
         '''
         Handles GET requests for getting all plants.
         '''
+
+        print('SESSION: ', session['jwt_payload']['email'])
 
         # get all plants from database
         plants = Plant.query.all()

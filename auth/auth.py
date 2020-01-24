@@ -187,6 +187,6 @@ def create_login_link():
     link += '/authorize?'
     link += 'audience=' + AUTH0_AUDIENCE + '&'
     link += 'response_type=token&'
-    link += 'AUTH0_CLIENT_ID=' + AUTH0_CLIENT_ID + '&'
+    link += 'client_id=' + AUTH0_CLIENT_ID + '&'
     link += 'redirect_uri=' + AUTH0_CALLBACK_URL
     return link
