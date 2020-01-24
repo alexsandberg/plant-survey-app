@@ -1,6 +1,6 @@
 header {
-    padding-top: 20px;
     padding-bottom: 20px;
+    
 }
 
 h1 {
@@ -9,6 +9,9 @@ h1 {
     text-align: center;
 }
 
+#content {
+    padding-top: 60px;
+}
 
 .posts-container {
     display: flex;
