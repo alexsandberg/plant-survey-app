@@ -112,8 +112,6 @@ def create_app(test_config=None):
         Handles GET requests for getting all plants.
         '''
 
-        print('SESSION: ', session['jwt_payload']['email'])
-
         # get all plants from database
         plants = Plant.query.all()
 
