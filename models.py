@@ -2,9 +2,16 @@ import os
 from sqlalchemy import Column, String, Integer
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from dotenv import load_dotenv, find_dotenv
+
+# set up environment variables using dotenv
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
 
 
 database_path = os.getenv('DATABASE_URL')
+print('DATABASE PATH: ', database_path)
 
 db = SQLAlchemy()
 
@@ -30,6 +37,7 @@ class Plant(db.Model):
     __tablename__ = 'Plant'
 
     id = Column(Integer, primary_key=True)
+    contributor_email = Column(String(120), nullable=False)
     name = Column(String(120), nullable=False)
     latin_name = Column(String(120), nullable=False)
     description = Column(String(2500), nullable=False)
@@ -45,7 +53,6 @@ class Plant(db.Model):
 
     def __repr__(self):
         return f'<Plant {self.id} {self.name}>'
-        # return f'<Hike {self.id}>'
 
     def insert(self):
         db.session.add(self)
@@ -61,6 +68,7 @@ class Plant(db.Model):
     def format(self):
         return {
             'id': self.id,
+            'contributor_email': self.contributor_email,
             'name': self.name,
             'latin_name': self.latin_name,
             'description': self.description,
@@ -77,6 +85,7 @@ class Observation(db.Model):
     __tablename__ = 'Observations'
 
     id = Column(Integer, primary_key=True)
+    contributor_email = Column(String(120), nullable=False)
     name = Column(String(120), nullable=False)
     date = Column(db.DateTime, nullable=False,
                   default=datetime.utcnow)
@@ -108,6 +117,7 @@ class Observation(db.Model):
     def format(self):
         return {
             'id': self.id,
+            'contributor_email': self.contributor_email,
             'name': self.name,
             'date': self.date,
             'plant_id': self.plant_id,
