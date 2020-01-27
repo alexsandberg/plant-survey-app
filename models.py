@@ -119,6 +119,8 @@ class Observation(db.Model):
             'contributor_email': self.contributor_email,
             'name': self.name,
             'date': self.date,
+            'plant_name': Plant.query.filter_by(id=self.plant_id).one_or_none().name,
+            'plant_image': Plant.query.filter_by(id=self.plant_id).one_or_none().image_link,
             'plant_id': self.plant_id,
             'notes': self.notes,
         }

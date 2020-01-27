@@ -11,7 +11,10 @@ h1 {
 
 #content {
     padding-top: 60px;
+    display: flex;
+    flex-wrap: wrap;
 }
+
 
 .posts-container {
     display: flex;
@@ -34,6 +37,7 @@ h1 {
     margin: 1.2em;
     max-width: 400px;
     transition: background-color .5s;
+    height: fit-content;
 }
 
 .plant-post {
