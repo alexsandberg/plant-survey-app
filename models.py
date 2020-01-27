@@ -27,6 +27,11 @@ def setup_db(app, database_path=database_path):
     db.init_app(app)
 
 
+# format datetime utility
+def format_datetime(datetime):
+    return "{:%B %d, %Y}".format(datetime.now())
+
+
 '''
 Plants
 '''
@@ -118,7 +123,7 @@ class Observation(db.Model):
             'id': self.id,
             'contributor_email': self.contributor_email,
             'name': self.name,
-            'date': self.date,
+            'date': format_datetime(self.date),
             'plant_name': Plant.query.filter_by(id=self.plant_id).one_or_none().name,
             'plant_image': Plant.query.filter_by(id=self.plant_id).one_or_none().image_link,
             'plant_id': self.plant_id,
