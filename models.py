@@ -11,7 +11,6 @@ if ENV_FILE:
 
 
 database_path = os.getenv('DATABASE_URL')
-print('DATABASE PATH: ', database_path)
 
 db = SQLAlchemy()
 

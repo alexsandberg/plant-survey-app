@@ -89,9 +89,23 @@ def create_app(test_config=None):
 
     @app.route('/dashboard')
     def dashboard():
+
+        # if no active jwt, redirect to home login page
+        if 'jwt_payload' not in session:
+            return redirect('/')
+
+        contributor_email = session['jwt_payload']['email']
+
+        # get all plants and observations that match user email
+        plants = Plant.query.filter_by(
+            contributor_email=contributor_email).all()
+        observations = Observation.query.filter_by(
+            contributor_email=contributor_email).all()
+
         return render_template('/pages/dashboard.html',
                                userinfo=session[constants.PROFILE_KEY],
-                               userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4))
+                               plants=plants,
+                               observations=observations)
 
     # ------------------------------------
     # ROUTES
