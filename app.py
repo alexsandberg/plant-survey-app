@@ -71,7 +71,8 @@ def create_app(test_config=None):
 
     @app.route('/callback')
     def callback_handling():
-        auth0.authorize_access_token()
+        # auth0.authorize_access_token()
+        print('AUTH: ', auth0.authorize_access_token())
         resp = auth0.get('userinfo')
         userinfo = resp.json()
 
@@ -144,6 +145,18 @@ def create_app(test_config=None):
         # get all plants from database
         plants = Plant.query.all()
 
+        for plant in plants:
+            print(
+                'PLANT: \n'
+                '{'
+                f'"contributorEmail": "{plant.contributor_email}",'
+                f'"name": "{plant.name}",'
+                f'"latinName": "{plant.latin_name}",'
+                f'"description": "{plant.description}",'
+                f'"imageLink": "{plant.image_link}"'
+                '}'
+            )
+
         # 404 if no plants found
         if len(plants) == 0:
             abort(404)
@@ -182,19 +195,23 @@ def create_app(test_config=None):
         body = request.get_json()
 
         # load data from body
+        contributor_email = body.get('contributorEmail')
         name = body.get('name')
         latin_name = body.get('latinName')
         description = body.get('description')
         image_link = body.get('imageLink')
 
+        print('EMAIL: ', contributor_email)
+
         # ensure all fields have data
-        if ((name is None) or (latin_name is None)
+        if ((contributor_email is None) or (name is None) or (latin_name is None)
                 or (description is None) or (image_link is None)):
             abort(422)
 
         # create a new plant
-        plant = Plant(name=name, latin_name=latin_name,
-                      description=description, image_link=image_link)
+        plant = Plant(contributor_email=contributor_email, name=name,
+                      latin_name=latin_name, description=description,
+                      image_link=image_link)
 
         try:
             # add plant to the database
@@ -243,6 +260,7 @@ def create_app(test_config=None):
                 abort(422)
 
             # update plant with data from body
+            # contributor_email is not allowed to be updated
             if body.get('name'):
                 plant.name = body.get('name')
 
@@ -324,19 +342,21 @@ def create_app(test_config=None):
         body = request.get_json()
 
         # load data from body
+        contributor_email = body.get('contributorEmail')
         name = body.get('name')
         date = body.get('date')
         plant_id = body.get('plantID')
         notes = body.get('notes')
 
         # ensure required fields have data
-        if ((name is None) or (date is None)
+        if ((contributor_email is None) or (name is None) or (date is None)
                 or (plant_id is None)):
             abort(422)
 
         # create a new plant
-        observation = Observation(
-            name=name, date=date, plant_id=plant_id, notes=notes)
+        observation = Observation(contributor_email=contributor_email,
+                                  name=name, date=date, plant_id=plant_id,
+                                  notes=notes)
 
         try:
             # add observation to the database
@@ -385,6 +405,7 @@ def create_app(test_config=None):
                 abort(422)
 
             # update observation with data from body
+            # contributor_email is not allowed to be updated
             if body.get('name'):
                 observation.name = body.get('name')
 

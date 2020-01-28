@@ -54,7 +54,8 @@ class Plant(db.Model):
     plant_observations = db.relationship(
         'Observation', backref='plant', lazy=True)
 
-    def __init__(self, name, latin_name, description, image_link):
+    def __init__(self, contributor_email, name, latin_name, description, image_link):
+        self.contributor_email = contributor_email
         self.name = name
         self.latin_name = latin_name
         self.description = description
@@ -105,7 +106,8 @@ class Observation(db.Model):
     notes = Column(String(2500))
     # add GPS location?
 
-    def __init__(self, name, date, plant_id, notes):
+    def __init__(self, contributor_email, name, date, plant_id, notes):
+        self.contributor_email = contributor_email
         self.name = name
         self.date = date
         self.plant_id = plant_id
