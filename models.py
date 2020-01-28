@@ -32,6 +32,11 @@ def format_datetime(datetime):
     return "{:%B %d, %Y}".format(datetime.now())
 
 
+# format plant_observations
+def format_plant_observations(plant_observations):
+    return [observation.format() for observation in plant_observations]
+
+
 '''
 Plants
 '''
@@ -76,7 +81,9 @@ class Plant(db.Model):
             'name': self.name,
             'latin_name': self.latin_name,
             'description': self.description,
-            'image_link': self.image_link
+            'image_link': self.image_link,
+            'plant_observations':
+                format_plant_observations(self.plant_observations)
         }
 
 

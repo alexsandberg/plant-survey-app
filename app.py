@@ -59,6 +59,14 @@ def create_app(test_config=None):
                              'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
+    # UTILITY –– plant and observation formatting
+
+    def format_plants(plants):
+        return [plant.format() for plant in plants]
+
+    def format_observations(observations):
+        return [observation.format() for observation in observations]
+
     # AUTH ROUTES -- AUTH0 BOILERPLATE
 
     @app.route('/callback')
@@ -87,6 +95,10 @@ def create_app(test_config=None):
             'home', _external=True), 'client_id': AUTH0_CLIENT_ID}
         return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
 
+    # ------------------------------------
+    # ROUTES
+    # ------------------------------------
+
     @app.route('/dashboard')
     def dashboard():
 
@@ -102,14 +114,17 @@ def create_app(test_config=None):
         observations = Observation.query.filter_by(
             contributor_email=contributor_email).all()
 
+        # format all plants and observations
+        if (len(plants) != 0):
+            plants = format_plants(plants)
+
+        if (len(observations) != 0):
+            observations = format_observations(observations)
+
         return render_template('/pages/dashboard.html',
                                userinfo=session[constants.PROFILE_KEY],
                                plants=plants,
                                observations=observations)
-
-    # ------------------------------------
-    # ROUTES
-    # ------------------------------------
 
     # home page route handler
     @app.route('/')
@@ -133,36 +148,12 @@ def create_app(test_config=None):
         if len(plants) == 0:
             abort(404)
 
-        plants_formatted = []
-
         # format each plant
-        for plant in plants:
-
-            # get plant observations
-            observations = plant.plant_observations
-
-            # format plan
-            plant = plant.format()
-
-            plant_observations = []
-
-            # format each observation
-            for observation in observations:
-                plant_observations.append(observation.format())
-
-            # add formatted observations to formatted plant
-            plant['plant_observations'] = plant_observations
-
-            plants_formatted.append(plant)
+        plants = format_plants(plants)
 
         # return plants
         return render_template('pages/plants.html',
-                               plants=plants_formatted), 200
-        # return plants
-        # return jsonify({
-        #     'success': True,
-        #     'plants': plants_formatted
-        # })
+                               plants=plants), 200
 
     @app.route('/plants/<int:id>')
     def get_plant_by_id(*args, **kwargs):
@@ -311,15 +302,12 @@ def create_app(test_config=None):
         if not observations:
             abort(404)
 
-        observations_formatted = []
-
         # format each observation
-        for observation in observations:
-            observations_formatted.append(observation.format())
+        observations = format_observations(observations)
 
         # return observations
         return render_template('pages/observations.html',
-                               observations=observations_formatted), 200
+                               observations=observations), 200
         # return jsonify({
         #     'success': True,
         #     'observations': observations_formatted

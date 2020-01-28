@@ -24,27 +24,24 @@
         <div class="post-img-container">
             <a href="/plants/{{ plant.id }}"><img src="{{ plant.image_link }}" alt="Plant Image" /></a>
         </div>
-        <!-- <p>{{ plant.image_link }}</p> -->
     </div>
     {% endfor %}
-
-
-    <div class="posts-container">
-        {% for observation in observations %}
-        <div class="card post" style="width: 18rem; ">
-            <a href="/plants/{{ observation.plant_id }}"><img class="card-img-top" src="{{ observation.plant_image }}"
-                    alt="Plant Image" /></a>
-            <div class="card-body">
-                <h5 class="card-title">{{ observation.plant_name }}</h5>
-                <p class="card-text">{{ observation.date }}</p>
-                <p class="card-text">{{ observation.notes }}</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <a id="qsLogoutBtn" class="btn btn-primary btn-lg btn-logout btn-block" href="/logout">Logout</a>
-
 </div>
+
+<div class="posts-container">
+    {% for observation in observations %}
+    <div class="card post" style="width: 18rem; ">
+        <a href="/plants/{{ observation.plant_id }}"><img class="card-img-top" src="{{ observation.plant_image }}"
+                alt="Plant Image" /></a>
+        <div class="card-body">
+            <h5 class="card-title">{{ observation.plant_name }}</h5>
+            <p class="card-text">{{ observation.date }}</p>
+            <p class="card-text">{{ observation.notes }}</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<a id="qsLogoutBtn" class="btn btn-primary btn-lg btn-logout btn-block" href="/logout">Logout</a>
 {% endblock %}

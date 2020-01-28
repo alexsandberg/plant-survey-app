@@ -1,10 +1,14 @@
 {% extends 'layouts/main.html' %}
+{% block title %}{{ plant.name }}{% endblock %}
 {% block content %}
-
 <div class="posts-container">
+
     <div class="plant-post">
+
         <div class="post-text-container">
-            <h3>{{ plant.name }}</h3>
+            <a href="/plants/{{ plant.id }}">
+                <h3>{{ plant.name }}</h3>
+            </a>
             <p>{{ plant.latin_name }}</p>
             <p>{{ plant.description }}</p>
             <div class="post-observations">
@@ -16,11 +20,12 @@
             </div>
         </div>
 
+
         <div class="post-img-container">
-            <img src="{{ plant.image_link }}" alt="Plant Image" />
+            <a href="/plants/{{ plant.id }}"><img src="{{ plant.image_link }}" alt="Plant Image" /></a>
         </div>
         <!-- <p>{{ plant.image_link }}</p> -->
     </div>
-</div>
 
+</div>
 {% endblock %}
