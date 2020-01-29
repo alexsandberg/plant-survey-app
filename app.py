@@ -1,4 +1,5 @@
-from flask import Flask, request, abort, jsonify, render_template, redirect, url_for, session
+from flask import Flask, request, abort, jsonify, render_template, redirect, url_for, session, flash
+from functools import wraps
 from models import setup_db
 from flask_cors import CORS
 from os import environ as env
@@ -59,6 +60,16 @@ def create_app(test_config=None):
                              'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
+    def login_required(f):
+        @wraps(f)
+        def wrap(*args, **kwargs):
+            if 'logged_in' in session:
+                return f(*args, **kwargs)
+            else:
+                flash('You need to login first')
+                return redirect(url_for('home'))
+        return wrap
+
     # UTILITY –– plant and observation formatting
 
     def format_plants(plants):
@@ -75,6 +86,7 @@ def create_app(test_config=None):
         resp = auth0.get('userinfo')
         userinfo = resp.json()
 
+        session['logged_in'] = True
         session[constants.JWT_PAYLOAD] = userinfo
         session[constants.JWT] = token['access_token']
         session[constants.PROFILE_KEY] = {
@@ -91,6 +103,7 @@ def create_app(test_config=None):
 
     @app.route('/logout')
     def logout():
+        # session.pop('logged_in', None)
         session.clear()
         params = {'returnTo': url_for(
             'home', _external=True), 'client_id': AUTH0_CLIENT_ID}
@@ -185,6 +198,7 @@ def create_app(test_config=None):
                                plant=plant.format()), 200
 
     @app.route('/plants/new')
+    @login_required
     def new_plant_form():
         '''
         Handles GET requests for new plant form page.
@@ -197,6 +211,7 @@ def create_app(test_config=None):
 
     @app.route('/plants/new', methods=['POST'])
     @requires_auth('post:plants')
+    @login_required
     def new_plant(jwt):
         '''
         Handles POST requests for adding new plant.
@@ -217,8 +232,8 @@ def create_app(test_config=None):
         # image_link = body.get('imageLink')
 
         # ensure all fields have data
-        if ((contributor_email is None) or (name is None) or (latin_name is None)
-                or (description is None) or (image_link is None)):
+        if ((contributor_email is None) or (name == "") or (latin_name == "")
+                or (description == "") or (image_link == "")):
             abort(422)
 
         # create a new plant
@@ -241,6 +256,7 @@ def create_app(test_config=None):
 
     @app.route('/plants/<int:id>', methods=['PATCH', 'DELETE'])
     @requires_auth('edit_or_delete:plants')
+    @login_required
     def edit_or_delete_plant(*args, **kwargs):
         '''
         Handles PATCH and DELETE requests for plants.
@@ -356,26 +372,53 @@ def create_app(test_config=None):
         #     'observations': observations_formatted
         # })
 
-    @app.route('/observations', methods=['POST'])
+    @app.route('/observations/new')
+    @login_required
+    def new_observation_form():
+        '''
+        Handles GET requests for new plant form page.
+        '''
+
+        # redirect to observations if plant id not included
+        if 'plant' not in request.args:
+            return redirect('/observations')
+
+        # get args from request
+        plant_id = request.args.get('plant')
+
+        # get plant by id
+        plant = Plant.query.filter_by(id=plant_id).one_or_none()
+
+        # abort 404 if not found
+        if plant is None:
+            abort(404)
+
+        form = ObservationForm()
+
+        # return new plant form
+        return render_template('forms/new_observation.html', form=form,
+                               plant=plant.format()), 200
+
+    @app.route('/observations/new', methods=['POST'])
     @requires_auth('post:observations')
+    @login_required
     def post_plant_observation(jwt):
         '''
         Handles POST requests for adding new observation.
         '''
 
-        # load the request body
-        body = request.get_json()
+        # load data from request
+        contributor_email = session['jwt_payload']['email']
+        plant_id = request.args.get('plant')
+        name = request.form['name']
+        date = request.form['date']
+        notes = request.form['notes']
 
-        # load data from body
-        contributor_email = body.get('contributorEmail')
-        name = body.get('name')
-        date = body.get('date')
-        plant_id = body.get('plantID')
-        notes = body.get('notes')
+        print('ARGS: ', name, date, notes)
 
         # ensure required fields have data
-        if ((contributor_email is None) or (name is None) or (date is None)
-                or (plant_id is None)):
+        if ((contributor_email is None) or (name == '') or (date == '')
+                or (plant_id == '')):
             abort(422)
 
         # create a new plant
@@ -398,6 +441,7 @@ def create_app(test_config=None):
 
     @app.route('/observations/<int:id>', methods=['PATCH', 'DELETE'])
     @requires_auth('edit_or_delete:observations')
+    @login_required
     def edit_or_delete_observation(*args, **kwargs):
         '''
         Handles PATCH and DELETE requests for observations.

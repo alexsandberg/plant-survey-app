@@ -1,0 +1,88 @@
+{% extends 'layouts/main.html' %}
+{% block title %} New Observation {% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="well">
+        <form id="observation-form" class="form-vertical" role="form" autocomplete="off" method="POST"
+            action="/observations/new?plant={{ plant.id }}">
+
+            <div class="form-group">
+                <label for="firstname" class="control-label">Your Name</label>
+                {% if session['jwt_payload']['name'] %}
+                <input type="text" class="form-control" name="name" id="observation_name"
+                    placeholder="{{ session['jwt_payload']['name'] }}">
+                {% elif session['jwt_payload']['email'] %}
+                <input type="text" class="form-control" name="name" id="observation_name"
+                    placeholder="{{ session['jwt_payload']['email'] }}">
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="datetimeField" class="control-label">Date</label>
+                <input type="datetime-local" class="form-control" name="date" id="datetimeField" value="">
+            </div>
+            <div class="form-group">
+                <label for="observation_textarea" class="control-label">Notes</label>
+                <textarea class="form-control" class="form-control" cols="40" id="observation_textarea" name="notes"
+                    rows="10"></textarea>
+            </div>
+            <div class="pull-right">
+                <br>
+                <div class="btn-group col-xs-12">
+                    <input type="submit" class="btn btn-primary"></input>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="posts-container" id="new-observation-plant-card">
+        <div class="plant-post">
+            <div class="post-text-container">
+                <a href="/plants/{{ plant.id }}">
+                    <h3>{{ plant.name }}</h3>
+                </a>
+                <p>{{ plant.latin_name }}</p>
+                <p>{{ plant.description }}</p>
+                <div class="post-observations">
+                    {% for observation in plant.plant_observations %}
+                    <p>{{ observation.name }}</p>
+                    <p>{{ observation.date }}</p>
+                    <p>{{ observation.notes }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="post-img-container">
+                <a href="/plants/{{ plant.id }}"><img src="{{ plant.image_link }}" alt="Plant Image" /></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    // https://stackoverflow.com/questions/24468518/html5-input-datetime-local-default-value-of-today-and-current-time
+    window.addEventListener("load", function () {
+        var now = new Date();
+        var utcString = now.toISOString().substring(0, 19);
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1;
+        var day = now.getDate();
+        var hour = now.getHours();
+        var minute = now.getMinutes();
+        var second = now.getSeconds();
+        var localDatetime = year + "-" +
+            (month < 10 ? "0" + month.toString() : month) + "-" +
+            (day < 10 ? "0" + day.toString() : day) + "T" +
+            (hour < 10 ? "0" + hour.toString() : hour) + ":" +
+            (minute < 10 ? "0" + minute.toString() : minute) +
+            utcString.substring(16, 19);
+        var datetimeField = document.getElementById("datetimeField");
+        datetimeField.value = localDatetime;
+    });
+
+</script>
+
+{% endblock %}

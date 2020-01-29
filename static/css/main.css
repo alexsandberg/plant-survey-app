@@ -72,3 +72,13 @@ h1 {
 .post-observations {
     overflow-y: scroll;
 }
+
+#observation-form {
+    width: 40%;
+}
+
+.form-group {
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
+}
