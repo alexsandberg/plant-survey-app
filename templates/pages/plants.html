@@ -2,6 +2,9 @@
 {% block title %}Plants{% endblock %}
 {% block content %}
 <div class="posts-container">
+    <a href="/plants/new">
+        <button class="btn btn-primary">New Plant</button>
+    </a>
     {% for plant in plants %}
     <div class="plant-post">
 

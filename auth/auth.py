@@ -172,12 +172,10 @@ def requires_auth(permission=''):
 
             # get token from session or header
             if constants.JWT in session:
-                print('ONE')
                 token = session[constants.JWT]
             else:
-                print('TWO')
                 token = get_token_auth_header()
-           
+
             # decode and validate token
             payload = verify_decode_jwt(token)
 
