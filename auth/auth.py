@@ -96,6 +96,8 @@ def verify_decode_jwt(token):
     Validates and decodes Auth0 JWTs
     '''
 
+    print('TOKEN: ', token)
+
     # get public key from Auth0
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
@@ -169,11 +171,13 @@ def requires_auth(permission=''):
         def wrapper(*args, **kwargs):
 
             # get token from session or header
-            if session[constants.JWT] != 'jwt':
+            if constants.JWT in session:
+                print('ONE')
                 token = session[constants.JWT]
             else:
+                print('TWO')
                 token = get_token_auth_header()
-
+           
             # decode and validate token
             payload = verify_decode_jwt(token)
 
