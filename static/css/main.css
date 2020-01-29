@@ -82,3 +82,8 @@ h1, h2 {
     margin-right: auto;
     width: auto;
 }
+
+.btn {
+    margin-left: 10px;
+    margin-right: 10px;
+}
