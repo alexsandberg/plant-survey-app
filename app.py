@@ -1,5 +1,4 @@
 from flask import Flask, request, abort, jsonify, render_template, redirect, url_for, session
-import json
 from models import setup_db
 from flask_cors import CORS
 from os import environ as env
@@ -9,6 +8,7 @@ from models import Plant, Observation
 from auth.auth import AuthError, requires_auth, create_login_link
 import constants
 from dotenv import load_dotenv, find_dotenv
+from forms import PlantForm, ObservationForm
 
 
 def create_app(test_config=None):
@@ -71,12 +71,12 @@ def create_app(test_config=None):
 
     @app.route('/callback')
     def callback_handling():
-        # auth0.authorize_access_token()
-        print('AUTH: ', auth0.authorize_access_token())
+        token = auth0.authorize_access_token()
         resp = auth0.get('userinfo')
         userinfo = resp.json()
 
         session[constants.JWT_PAYLOAD] = userinfo
+        session[constants.JWT] = token['access_token']
         session[constants.PROFILE_KEY] = {
             'user_id': userinfo['sub'],
             'name': userinfo['name'],
@@ -145,17 +145,17 @@ def create_app(test_config=None):
         # get all plants from database
         plants = Plant.query.all()
 
-        for plant in plants:
-            print(
-                'PLANT: \n'
-                '{'
-                f'"contributorEmail": "{plant.contributor_email}",'
-                f'"name": "{plant.name}",'
-                f'"latinName": "{plant.latin_name}",'
-                f'"description": "{plant.description}",'
-                f'"imageLink": "{plant.image_link}"'
-                '}'
-            )
+        # for plant in plants:
+        #     print(
+        #         'PLANT: \n'
+        #         '{'
+        #         f'"contributorEmail": "{plant.contributor_email}",'
+        #         f'"name": "{plant.name}",'
+        #         f'"latinName": "{plant.latin_name}",'
+        #         f'"description": "{plant.description}",'
+        #         f'"imageLink": "{plant.image_link}"'
+        #         '}'
+        #     )
 
         # 404 if no plants found
         if len(plants) == 0:
@@ -184,24 +184,37 @@ def create_app(test_config=None):
         return render_template('pages/plant.html',
                                plant=plant.format()), 200
 
-    @app.route('/plants', methods=['POST'])
+    @app.route('/plants/new')
+    def new_plant_form():
+        '''
+        Handles GET requests for new plant form page.
+        '''
+
+        form = PlantForm()
+
+        # return new plant form
+        return render_template('forms/new_plant.html', form=form), 200
+
+    @app.route('/plants/new', methods=['POST'])
     @requires_auth('post:plants')
     def new_plant(jwt):
         '''
         Handles POST requests for adding new plant.
         '''
 
-        # load the request body
-        body = request.get_json()
+        # load plant form data
+        form = PlantForm()
+        name = form.name.data
+        latin_name = form.latin_name.data
+        description = form.description.data
+        image_link = form.image_link.data
 
-        # load data from body
-        contributor_email = body.get('contributorEmail')
-        name = body.get('name')
-        latin_name = body.get('latinName')
-        description = body.get('description')
-        image_link = body.get('imageLink')
-
-        print('EMAIL: ', contributor_email)
+        # load contributor email from session
+        contributor_email = session['jwt_payload']['email']
+        # name = body.get('name')
+        # latin_name = body.get('latinName')
+        # description = body.get('description')
+        # image_link = body.get('imageLink')
 
         # ensure all fields have data
         if ((contributor_email is None) or (name is None) or (latin_name is None)
@@ -315,6 +328,18 @@ def create_app(test_config=None):
 
         # get all plant observations
         observations = Observation.query.all()
+
+        # for observation in observations:
+        #     print(
+        #         'OBSERVATION: \n'
+        #         '{'
+        #         f'"contributorEmail": "{observation.contributor_email}",'
+        #         f'"name": "{observation.name}",'
+        #         f'"date": "{observation.date}",'
+        #         f'"plantID": {observation.plant_id},'
+        #         f'"notes": "{observation.notes}"'
+        #         '}'
+        #     )
 
         # if no observations
         if not observations:

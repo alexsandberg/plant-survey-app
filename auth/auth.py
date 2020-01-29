@@ -1,9 +1,10 @@
 import json
 import os
-from flask import request
+from flask import request, session
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
+import constants
 
 
 AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
@@ -166,8 +167,12 @@ def requires_auth(permission=''):
     def requires_auth_decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            # get token from header
-            token = get_token_auth_header()
+
+            # get token from session or header
+            if session[constants.JWT] != 'jwt':
+                token = session[constants.JWT]
+            else:
+                token = get_token_auth_header()
 
             # decode and validate token
             payload = verify_decode_jwt(token)
