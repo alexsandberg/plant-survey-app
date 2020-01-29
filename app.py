@@ -9,7 +9,6 @@ from models import Plant, Observation
 from auth.auth import AuthError, requires_auth, create_login_link
 import constants
 from dotenv import load_dotenv, find_dotenv
-from forms import PlantForm, ObservationForm
 
 
 def create_app(test_config=None):
@@ -203,11 +202,8 @@ def create_app(test_config=None):
         '''
         Handles GET requests for new plant form page.
         '''
-
-        form = PlantForm()
-
         # return new plant form
-        return render_template('forms/new_plant.html', form=form), 200
+        return render_template('forms/new_plant.html'), 200
 
     @app.route('/plants/new', methods=['POST'])
     @requires_auth('post:plants')
@@ -218,18 +214,13 @@ def create_app(test_config=None):
         '''
 
         # load plant form data
-        form = PlantForm()
-        name = form.name.data
-        latin_name = form.latin_name.data
-        description = form.description.data
-        image_link = form.image_link.data
+        name = request.form['name']
+        latin_name = request.form['latin_name']
+        description = request.form['description']
+        image_link = request.form['image_link']
 
         # load contributor email from session
         contributor_email = session['jwt_payload']['email']
-        # name = body.get('name')
-        # latin_name = body.get('latinName')
-        # description = body.get('description')
-        # image_link = body.get('imageLink')
 
         # ensure all fields have data
         if ((contributor_email is None) or (name == "") or (latin_name == "")
@@ -367,10 +358,6 @@ def create_app(test_config=None):
         # return observations
         return render_template('pages/observations.html',
                                observations=observations), 200
-        # return jsonify({
-        #     'success': True,
-        #     'observations': observations_formatted
-        # })
 
     @app.route('/observations/new')
     @login_required
@@ -393,10 +380,8 @@ def create_app(test_config=None):
         if plant is None:
             abort(404)
 
-        form = ObservationForm()
-
         # return new plant form
-        return render_template('forms/new_observation.html', form=form,
+        return render_template('forms/new_observation.html',
                                plant=plant.format()), 200
 
     @app.route('/observations/new', methods=['POST'])
@@ -407,7 +392,7 @@ def create_app(test_config=None):
         Handles POST requests for adding new observation.
         '''
 
-        # load data from request
+        # load data from request and session
         contributor_email = session['jwt_payload']['email']
         plant_id = request.args.get('plant')
         name = request.form['name']

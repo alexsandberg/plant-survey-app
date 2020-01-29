@@ -8,7 +8,7 @@
             action="/observations/new?plant={{ plant.id }}">
 
             <div class="form-group">
-                <label for="firstname" class="control-label">Your Name</label>
+                <label for="observation_name" class="control-label">Your Name</label>
                 {% if session['jwt_payload']['name'] %}
                 <input type="text" class="form-control" name="name" id="observation_name"
                     placeholder="{{ session['jwt_payload']['name'] }}">
