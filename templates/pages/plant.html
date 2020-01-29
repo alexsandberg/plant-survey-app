@@ -18,13 +18,11 @@
                 <p>{{ observation.notes }}</p>
                 {% endfor %}
             </div>
+            <a href="/observations/new?plant={{ plant.id }}" class="btn btn-primary">Add an observation</a>
         </div>
-
-
         <div class="post-img-container">
             <a href="/plants/{{ plant.id }}"><img src="{{ plant.image_link }}" alt="Plant Image" /></a>
         </div>
-        <!-- <p>{{ plant.image_link }}</p> -->
     </div>
 
 </div>
