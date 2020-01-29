@@ -3,7 +3,7 @@ header {
     
 }
 
-h1 {
+h1, h2 {
     margin: auto;
     width: 100%;
     text-align: center;

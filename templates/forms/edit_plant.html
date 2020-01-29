@@ -1,0 +1,81 @@
+{% extends 'layouts/main.html' %}
+{% block title %} Edit Plant {% endblock %}
+{% block content %}
+
+
+<div class="container">
+    <h2>Edit Plant</h2>
+    <div class="well">
+        <div id="plantData" data-id="{{ plant.id }}"></div>
+        <form id="plant-edit-form" class="form-vertical needs-validation" autocomplete="off">
+
+            <div class="form-group">
+                <label for="plant-name" class="control-label">Plant Name</label>
+                <input type="text" class="form-control" name="name" id="plant-name" value="{{ plant.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="plant-latin-name" class="control-label">Latin Name</label>
+                <input type="text" class="form-control" name="latin_name" id="plant-latin-name"
+                    value="{{ plant.latin_name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="plant-description" class="control-label">Description</label>
+                <textarea class="form-control" class="form-control" cols="40" id="plant-description" name="description"
+                    rows="10" required>{{ plant.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="plant-image-link" class="control-label">Image link</label>
+                <input type="url" class="form-control" name="image_link" id="plant-image-link"
+                    value="{{ plant.image_link }}" required>
+            </div>
+            <div class="pull-right">
+                <br>
+                <div class="btn-group col-xs-12">
+                    <!-- <a href="/dashboard" class="btn btn-primary">Cancel</a> -->
+                    <button type="button" onclick="sendPatch()" class="btn btn-primary">Submit</button>
+                    <!-- <input type="button" class="btn btn-primary"></input> -->
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+
+    function sendPatch() {
+        let name = document.getElementById("plant-name").value;
+        let latinName = document.getElementById("plant-latin-name").value;
+        let description = document.getElementById("plant-description").value;
+        let imageLink = document.getElementById("plant-image-link").value;
+        let plantID = plantData.getAttribute("data-id");
+
+        let data = {
+            "name": name,
+            "latinName": latinName,
+            "description": description,
+            "imageLink": imageLink
+        }
+
+        fetch(`/plants/${plantID}/edit`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((myJson) => {
+                if (myJson['success'] == true) {
+                    // setTimeout(function () { window.location.href = '/dashboard'; }, 3000);
+                    window.location.href = '/dashboard';
+                }
+            });
+
+    }
+
+</script>
+
+{% endblock %}

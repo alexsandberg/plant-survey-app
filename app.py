@@ -1,4 +1,4 @@
-from flask import Flask, request, abort, jsonify, render_template, redirect, url_for, session, flash
+from flask import Flask, flash, request, abort, jsonify, render_template, redirect, url_for, session
 from functools import wraps
 from models import setup_db
 from flask_cors import CORS
@@ -56,7 +56,7 @@ def create_app(test_config=None):
         response.headers.add('Access-Control-Allow-Headers',
                              'Content-Type,Authorization,true')
         response.headers.add('Access-Control-Allow-Methods',
-                             'GET,PUT,POST,DELETE,OPTIONS')
+                             'GET,PUT,PATCH,POST,DELETE,OPTIONS')
         return response
 
     def login_required(f):
@@ -245,7 +245,24 @@ def create_app(test_config=None):
             "plant": plant.format()
         })
 
-    @app.route('/plants/<int:id>', methods=['PATCH', 'DELETE'])
+    @app.route('/plants/<int:id>/edit')
+    @requires_auth('edit_or_delete:plants')
+    @login_required
+    def get_edit_plant_form(*args, **kwargs):
+        '''
+        Handles GET requests for edit plant form.
+        '''
+
+        # get id from kwargs
+        id = kwargs['id']
+
+        # get plant by id
+        plant = Plant.query.filter_by(id=id).one_or_none()
+
+        # return edit plant template with plant info
+        return render_template('forms/edit_plant.html', plant=plant.format()), 200
+
+    @app.route('/plants/<int:id>/edit', methods=['PATCH', 'DELETE'])
     @requires_auth('edit_or_delete:plants')
     @login_required
     def edit_or_delete_plant(*args, **kwargs):
@@ -300,10 +317,12 @@ def create_app(test_config=None):
                 print('ERROR: ', str(e))
                 abort(422)
 
+            # flash success message
+            flash('Plant successfully updated.')
+
             # return plant if success
             return jsonify({
-                "success": True,
-                "plant": plant.format()
+                "success": True
             })
 
         # if DELETE
@@ -398,8 +417,6 @@ def create_app(test_config=None):
         name = request.form['name']
         date = request.form['date']
         notes = request.form['notes']
-
-        print('ARGS: ', name, date, notes)
 
         # ensure required fields have data
         if ((contributor_email is None) or (name == '') or (date == '')
