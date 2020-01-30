@@ -601,9 +601,12 @@ def create_app(test_config=None):
     '''
     @app.errorhandler(AuthError)
     def handle_auth_error(ex):
+        message = ex.error['description']
         response = jsonify(ex.error)
         response.status_code = ex.status_code
-        return response
+        print('AUTH ERROR: ', response.get_data(as_text=True))
+        flash(f'{message} Please login.')
+        return redirect('/')
 
     return app
 
