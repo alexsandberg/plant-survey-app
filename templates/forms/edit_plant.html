@@ -32,6 +32,7 @@
                 <br>
                 <a href="/dashboard" class="btn btn-primary">Cancel</a>
                 <button type="button" onclick="sendPatch()" class="btn btn-primary">Submit</button>
+                <button type="button" onclick="sendDelete()" class="btn btn-danger">Delete Plant</button>
             </div>
 
         </form>
@@ -67,6 +68,24 @@
             .then((myJson) => {
                 if (myJson['success'] == true) {
                     // setTimeout(function () { window.location.href = '/dashboard'; }, 3000);
+                    window.location.href = '/dashboard';
+                }
+            });
+
+    }
+
+    function sendDelete() {
+        // get the plant id from data
+        let plantID = plantData.getAttribute("data-id");
+
+        fetch(`/plants/${plantID}/edit`, {
+            method: 'DELETE',
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((myJson) => {
+                if (myJson['success'] == true) {
                     window.location.href = '/dashboard';
                 }
             });

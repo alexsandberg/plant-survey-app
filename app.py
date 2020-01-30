@@ -332,6 +332,11 @@ def create_app(test_config=None):
             plant_name = plant.name
             plant_id = plant.id
 
+            # first delete all observations related to plant
+            observations = Observation.query.filter_by(plant_id=id).all()
+            for observation in observations:
+                observation.delete()
+
             try:
                 # delete plant from the database
                 plant.delete()
