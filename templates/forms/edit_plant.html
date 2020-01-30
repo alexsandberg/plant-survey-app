@@ -31,11 +31,58 @@
             <div class="pull-right">
                 <br>
                 <a href="/dashboard" class="btn btn-primary">Cancel</a>
-                <button type="button" onclick="sendPatch()" class="btn btn-primary">Submit</button>
-                <button type="button" onclick="sendDelete()" class="btn btn-danger">Delete Plant</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal"
+                    data-target="#submitModal">Submit</button>
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Delete
+                    Plant</button>
             </div>
-
         </form>
+
+        <!-- Submit Modal -->
+        <div class="modal fade" id="submitModal" tabindex="-1" role="dialog" aria-labelledby="submitModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="submitModalLabel">Edit Plant</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you'd like to save these changes?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="sendPatch()">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">WARNING — Delete Plant</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you'd like to delete this plant? This cannot be undone!
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" onclick="sendDelete()">Yes, delete plant</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -89,7 +136,6 @@
                     window.location.href = '/dashboard';
                 }
             });
-
     }
 
 </script>
