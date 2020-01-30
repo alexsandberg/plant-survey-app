@@ -239,11 +239,11 @@ def create_app(test_config=None):
             print('ERROR: ', str(e))
             abort(422)
 
-        # return plant if success
-        return jsonify({
-            "success": True,
-            "plant": plant.format()
-        })
+        # flash success message
+        flash(f'Plant {name} successfully created!')
+
+        # return redirect to dashboard
+        return redirect('/dashboard')
 
     @app.route('/plants/<int:id>/edit')
     @requires_auth('edit_or_delete:plants')
@@ -435,11 +435,11 @@ def create_app(test_config=None):
             print('ERROR: ', str(e))
             abort(422)
 
-        # return observation if success
-        return jsonify({
-            "success": True,
-            "observation": observation.format()
-        })
+        # flash success message
+        flash('Observation successfully created!')
+
+        # return redirect to dashboard
+        return redirect('/dashboard')
 
     @app.route('/observations/<int:id>', methods=['PATCH', 'DELETE'])
     @requires_auth('edit_or_delete:observations')
