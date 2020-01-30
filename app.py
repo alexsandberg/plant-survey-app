@@ -318,7 +318,7 @@ def create_app(test_config=None):
                 abort(422)
 
             # flash success message
-            flash('Plant successfully updated.')
+            flash(f'Plant {plant.name} successfully updated.')
 
             # return plant if success
             return jsonify({
@@ -328,9 +328,8 @@ def create_app(test_config=None):
         # if DELETE
         if request.method == 'DELETE':
 
-            # save plant name and id
+            # save plant name
             plant_name = plant.name
-            plant_id = plant.id
 
             # first delete all observations related to plant
             observations = Observation.query.filter_by(plant_id=id).all()
@@ -344,11 +343,12 @@ def create_app(test_config=None):
                 print('ERROR: ', str(e))
                 abort(422)
 
-            # return plant name if successfully deleted
+            # flash success message
+            flash(f'Plant {plant_name} successfully deleted.')
+
+            # return if successfully deleted
             return jsonify({
-                "success": True,
-                "plant_name": plant_name,
-                "plant_id": plant_id
+                "success": True
             })
 
     @app.route('/observations')
