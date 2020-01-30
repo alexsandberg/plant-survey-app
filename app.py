@@ -493,8 +493,6 @@ def create_app(test_config=None):
             for key in body:
                 body_keys.append(key)
 
-            print('BODY KEYS: ', body_keys)
-
             # make sure correct keys are present
             if sorted(body_keys) != sorted(['name', 'date', 'notes']):
                 abort(422)
@@ -520,6 +518,9 @@ def create_app(test_config=None):
                 print('ERROR: ', str(e))
                 abort(422)
 
+            # flash success message
+            flash('Observation successfully updated!')
+
             # return observation if success
             return jsonify({
                 "success": True,
@@ -539,6 +540,9 @@ def create_app(test_config=None):
             except Exception as e:
                 print('ERROR: ', str(e))
                 abort(422)
+
+            # flash success message
+            flash('Observation successfully deleted!')
 
             # return success
             return jsonify({
