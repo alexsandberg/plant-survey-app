@@ -132,6 +132,7 @@ class Observation(db.Model):
             'id': self.id,
             'contributor_email': self.contributor_email,
             'name': self.name,
+            'datetime': self.date,
             'date': format_datetime(self.date),
             'plant_name': Plant.query.filter_by(id=self.plant_id).one_or_none().name,
             'plant_image': Plant.query.filter_by(id=self.plant_id).one_or_none().image_link,

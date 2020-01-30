@@ -38,7 +38,7 @@
             <h5 class="card-title">{{ observation.plant_name }}</h5>
             <p class="card-text">{{ observation.date }}</p>
             <p class="card-text">{{ observation.notes }}</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+            <a href="/observations/{{ observation.id }}/edit" class="btn btn-primary">Edit Observation</a>
         </div>
     </div>
     {% endfor %}

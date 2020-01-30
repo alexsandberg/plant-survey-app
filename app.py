@@ -446,7 +446,25 @@ def create_app(test_config=None):
         # return redirect to dashboard
         return redirect('/dashboard')
 
-    @app.route('/observations/<int:id>', methods=['PATCH', 'DELETE'])
+    @app.route('/observations/<int:id>/edit')
+    @requires_auth('edit_or_delete:observations')
+    @login_required
+    def get_edit_observation_form(*args, **kwargs):
+        '''
+        Handles GET requests for edit observation form.
+        '''
+
+        # get id from kwargs
+        id = kwargs['id']
+
+        # get plant by id
+        observation = Observation.query.filter_by(id=id).one_or_none()
+
+        # return edit plant template with plant info
+        return render_template('forms/edit_observation.html',
+                               observation=observation.format()), 200
+
+    @app.route('/observations/<int:id>/edit', methods=['PATCH', 'DELETE'])
     @requires_auth('edit_or_delete:observations')
     @login_required
     def edit_or_delete_observation(*args, **kwargs):
@@ -475,9 +493,10 @@ def create_app(test_config=None):
             for key in body:
                 body_keys.append(key)
 
+            print('BODY KEYS: ', body_keys)
+
             # make sure correct keys are present
-            if sorted(body_keys) != sorted(['name', 'date', 'plantID',
-                                            'notes']):
+            if sorted(body_keys) != sorted(['name', 'date', 'notes']):
                 abort(422)
 
             # update observation with data from body

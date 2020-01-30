@@ -1,0 +1,159 @@
+{% extends 'layouts/main.html' %}
+{% block title %} Edit Observation {% endblock %}
+{% block content %}
+
+
+<div class="container">
+    <h2>Edit Observation</h2>
+    <div class="well">
+        <div id="observationData" data-id="{{ observation.id }}" data-date="{{ observation.datetime }}"></div>
+        <form id="observation-edit-form" class="form-vertical needs-validation" autocomplete="off">
+
+            <div class="form-group">
+                <label for="edit-observation-name" class="control-label">Name</label>
+                <input type="text" class="form-control" name="name" id="edit-observation-name"
+                    value="{{ observation.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-datetime-field" class="control-label">Date</label>
+                <input type="datetime-local" class="form-control" name="date" id="edit-datetime-field">
+            </div>
+            <div class="form-group">
+                <label for="edit-observation-notes" class="control-label">Notes</label>
+                <textarea class="form-control" class="form-control" cols="40" id="edit-observation-notes" name="notes"
+                    rows="10">{{ observation.notes }}</textarea>
+            </div>
+            <div class="pull-right">
+                <br>
+                <a href="/dashboard" class="btn btn-primary">Cancel</a>
+                <button type="button" class="btn btn-primary" data-toggle="modal"
+                    data-target="#submitObservationModal">Submit</button>
+                <button type="button" class="btn btn-danger" data-toggle="modal"
+                    data-target="#deleteObservationModal">Delete
+                    Observation</button>
+            </div>
+        </form>
+
+        <!-- Submit Modal -->
+        <div class="modal fade" id="submitObservationModal" tabindex="-1" role="dialog"
+            aria-labelledby="submitObservationModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="submitObservationModalLabel">Edit Observation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you'd like to save these changes?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="sendObservationPatch()">Save
+                            changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteObservationModal" tabindex="-1" role="dialog"
+            aria-labelledby="deleteObservationModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteObservationModalLabel">WARNING — Delete Observation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you'd like to delete this observation? This cannot be undone!
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" onclick="sendObservationDelete()">Yes, delete
+                            observation</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    // https://stackoverflow.com/questions/24468518/html5-input-datetime-local-default-value-of-today-and-current-time
+    window.addEventListener("load", function () {
+        var date = new Date(observationData.getAttribute("data-date"));
+        var utcString = date.toISOString().substring(0, 19);
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var day = date.getDate();
+        var hour = date.getHours();
+        var minute = date.getMinutes();
+        var second = date.getSeconds();
+        var defaultDate = year + "-" +
+            (month < 10 ? "0" + month.toString() : month) + "-" +
+            (day < 10 ? "0" + day.toString() : day) + "T" +
+            (hour < 10 ? "0" + hour.toString() : hour) + ":" +
+            (minute < 10 ? "0" + minute.toString() : minute) +
+            utcString.substring(16, 19);
+        var datetimeField = document.getElementById("edit-datetime-field");
+        datetimeField.value = defaultDate;
+    });
+
+    function sendObservationPatch() {
+        let name = document.getElementById("edit-observation-name").value;
+        let date = document.getElementById("edit-datetime-field").value;
+        let notes = document.getElementById("edit-observation-notes").value;
+        let observationID = observationData.getAttribute("data-id");
+
+        let data = {
+            "name": name,
+            "date": date,
+            "notes": notes
+        }
+
+        fetch(`/observations/${observationID}/edit`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((myJson) => {
+                if (myJson['success'] == true) {
+                    // setTimeout(function () { window.location.href = '/dashboard'; }, 3000);
+                    window.location.href = '/dashboard';
+                }
+            });
+
+    }
+
+    function sendObservationDelete() {
+        // get the observation id from data
+        let observationID = observationData.getAttribute("data-id");
+
+        fetch(`/observations/${observationID}/edit`, {
+            method: 'DELETE',
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((myJson) => {
+                if (myJson['success'] == true) {
+                    window.location.href = '/dashboard';
+                }
+            });
+    }
+
+</script>
+
+{% endblock %}
