@@ -11,18 +11,26 @@
             </a>
             <p>{{ plant.latin_name }}</p>
             <p>{{ plant.description }}</p>
-            <div class="post-observations">
-                {% for observation in plant.plant_observations %}
-                <p>{{ observation.name }}</p>
-                <p>{{ observation.date }}</p>
-                <p>{{ observation.notes }}</p>
-                {% endfor %}
-            </div>
             <a href="/observations/new?plant={{ plant.id }}" class="btn btn-primary">Add an observation</a>
         </div>
         <div class="post-img-container">
             <a href="/plants/{{ plant.id }}"><img src="{{ plant.image_link }}" alt="Plant Image" /></a>
         </div>
+    </div>
+
+    <div class="posts-container">
+        {% for observation in plant.plant_observations %}
+        <div class="card post" style="width: 18rem; ">
+            <a href="/plants/{{ observation.plant_id }}"><img class="card-img-top" src="{{ observation.plant_image }}"
+                    alt="Plant Image" /></a>
+            <div class="card-body">
+                <h5 class="card-title">{{ observation.plant_name }}</h5>
+                <p class="card-text">{{ observation.date }}</p>
+                <p class="card-text">{{ observation.notes }}</p>
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 
 </div>

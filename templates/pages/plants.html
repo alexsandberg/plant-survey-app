@@ -14,13 +14,6 @@
             </a>
             <p>{{ plant.latin_name }}</p>
             <p>{{ plant.description }}</p>
-            <div class="post-observations">
-                {% for observation in plant.plant_observations %}
-                <p>{{ observation.name }}</p>
-                <p>{{ observation.date }}</p>
-                <p>{{ observation.notes }}</p>
-                {% endfor %}
-            </div>
             <a href="/observations/new?plant={{ plant.id }}" class="btn btn-primary">Add an observation</a>
         </div>
 
