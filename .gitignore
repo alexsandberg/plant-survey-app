@@ -17,6 +17,7 @@ docs/_build/
 __pycache__
 .vscode/*
 setup.sh
+notes.txt
 
 # Coverage reports
 htmlcov/
