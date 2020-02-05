@@ -117,7 +117,7 @@ def create_app(test_config=None):
 
         # if no active jwt, redirect to home login page
         if 'jwt_payload' not in session:
-            return redirect('/')
+            return render_template('pages/login.html'), 200
 
         contributor_email = session['jwt_payload']['email']
 
@@ -146,7 +146,7 @@ def create_app(test_config=None):
         # add login link function to jinja context
         app.jinja_env.globals.update(create_login_link=create_login_link)
 
-        return render_template('pages/home.html'), 200
+        return redirect('dashboard')
 
     @app.route('/plants')
     def plants():
