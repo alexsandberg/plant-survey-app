@@ -219,6 +219,8 @@ def create_app(test_config=None):
         description = request.form['description']
         image_link = request.form['image_link']
 
+        print('DATA: ', name, latin_name, description, image_link)
+
         # load contributor email from session
         contributor_email = session['jwt_payload']['email']
 

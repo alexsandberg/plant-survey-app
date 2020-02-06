@@ -11,10 +11,10 @@
                 <label for="observation_name" class="control-label">Your Name</label>
                 {% if session['jwt_payload']['name'] %}
                 <input type="text" class="form-control" name="name" id="observation_name"
-                    placeholder="{{ session['jwt_payload']['name'] }}">
+                    placeholder="{{ session['jwt_payload']['name'] }}" required>
                 {% elif session['jwt_payload']['email'] %}
                 <input type="text" class="form-control" name="name" id="observation_name"
-                    placeholder="{{ session['jwt_payload']['email'] }}">
+                    placeholder="{{ session['jwt_payload']['email'] }}" required>
                 {% endif %}
             </div>
             <div class="form-group">

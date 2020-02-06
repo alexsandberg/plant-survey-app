@@ -29,7 +29,7 @@ def setup_db(app, database_path=database_path):
 
 # format datetime utility
 def format_datetime(datetime):
-    return "{:%B %d, %Y}".format(datetime.now())
+    return "{:%B %d, %Y}".format(datetime)
 
 
 # format plant_observations

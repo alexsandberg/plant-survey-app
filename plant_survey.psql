@@ -29,7 +29,8 @@ CREATE TABLE public."Observations" (
     name character varying(120) NOT NULL,
     date timestamp without time zone NOT NULL,
     plant_id integer NOT NULL,
-    notes character varying(2500)
+    notes character varying(2500),
+    contributor_email character varying(120) NOT NULL
 );
 
 
@@ -66,7 +67,8 @@ CREATE TABLE public."Plant" (
     name character varying(120) NOT NULL,
     latin_name character varying(120) NOT NULL,
     description character varying(2500) NOT NULL,
-    image_link character varying(500) NOT NULL
+    image_link character varying(500) NOT NULL,
+    contributor_email character varying(120) NOT NULL
 );
 
 
@@ -123,7 +125,7 @@ ALTER TABLE ONLY public."Plant" ALTER COLUMN id SET DEFAULT nextval('public."Pla
 -- Data for Name: Observations; Type: TABLE DATA; Schema: public; Owner: alex
 --
 
-COPY public."Observations" (id, name, date, plant_id, notes) FROM stdin;
+COPY public."Observations" (id, name, date, plant_id, notes, contributor_email) FROM stdin;
 \.
 
 
@@ -131,7 +133,7 @@ COPY public."Observations" (id, name, date, plant_id, notes) FROM stdin;
 -- Data for Name: Plant; Type: TABLE DATA; Schema: public; Owner: alex
 --
 
-COPY public."Plant" (id, name, latin_name, description, image_link) FROM stdin;
+COPY public."Plant" (id, name, latin_name, description, image_link, contributor_email) FROM stdin;
 \.
 
 
@@ -140,6 +142,7 @@ COPY public."Plant" (id, name, latin_name, description, image_link) FROM stdin;
 --
 
 COPY public.alembic_version (version_num) FROM stdin;
+19fcc623bd9e
 5366394e4835
 \.
 
