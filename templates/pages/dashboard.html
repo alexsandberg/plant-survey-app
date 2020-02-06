@@ -2,6 +2,14 @@
 {% block title %} Dashboard {% endblock %}
 {% block content %}
 <div class="posts-container">
+
+    {% if session['jwt_payload']['email'] == 'alexsandberg7@gmail.com' %}
+    <a href="/plants/new">
+        <button class="btn btn-primary">New Plant</button>
+    </a>
+    {% endif %}
+
+
     {% for plant in plants %}
     <div class="plant-post">
 
@@ -20,6 +28,7 @@
 
     </div>
     {% endfor %}
+</div>
 </div>
 
 <div class="posts-container">
