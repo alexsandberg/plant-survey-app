@@ -553,6 +553,8 @@ def create_app(test_config=None):
                 "observation_id": observation_id
             })
 
+    # API ROUTES
+
     @app.route('/api/plants')
     def get_plants_api():
         '''
@@ -573,6 +575,66 @@ def create_app(test_config=None):
         return jsonify({
             'success': True,
             'plants': plants
+        })
+
+    @app.route('/api/plants/<int:id>')
+    def get_plant_by_id_api(id):
+        '''
+        Handles API GET requests for getting plant by ID. Returns JSON.
+        '''
+
+        # get plant by ID
+        plant = Plant.query.filter_by(id=id).one_or_none()
+
+        # 404 if no plants found
+        if plant is None:
+            abort(404)
+
+        # return formatted plant
+        return jsonify({
+            'success': True,
+            'plant': plant.format()
+        })
+
+    @app.route('/api/observations')
+    def get_observations_api():
+        '''
+        Handles API GET requests for getting all observations. Returns JSON.
+        '''
+
+        # get all observations from database
+        observations = Observation.query.all()
+
+        # 404 if no observations found
+        if len(observations) == 0:
+            abort(404)
+
+        # format each observation
+        observations = format_observations(observations)
+
+        # return observations
+        return jsonify({
+            'success': True,
+            'observations': observations
+        })
+
+    @app.route('/api/observations/<int:id>')
+    def get_observation_by_id_api(id):
+        '''
+        Handles API GET requests for getting all observations. Returns JSON.
+        '''
+
+        # get observation from database by id
+        observation = Observation.query.filter_by(id=id).one_or_none()
+
+        # 404 if no observation found
+        if observation is None:
+            abort(404)
+
+        # return formatted observation
+        return jsonify({
+            'success': True,
+            'observation': observation.format()
         })
 
     # Error Handling
