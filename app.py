@@ -411,9 +411,9 @@ def create_app(test_config=None):
                                plant=plant.format()), 200
 
     @app.route('/observations/new', methods=['POST'])
-    @requires_auth('post:observations')
+    # @requires_auth('post:observations')
     @login_required
-    def post_plant_observation(jwt):
+    def post_plant_observation():
         '''
         Handles POST requests for adding new observation.
         '''
@@ -449,7 +449,7 @@ def create_app(test_config=None):
         return redirect('/dashboard')
 
     @app.route('/observations/<int:id>/edit')
-    @requires_auth('edit_or_delete:observations')
+    # @requires_auth('edit_or_delete:observations')
     @login_required
     def get_edit_observation_form(*args, **kwargs):
         '''
@@ -467,7 +467,7 @@ def create_app(test_config=None):
                                observation=observation.format()), 200
 
     @app.route('/observations/<int:id>/edit', methods=['PATCH', 'DELETE'])
-    @requires_auth('edit_or_delete:observations')
+    # @requires_auth('edit_or_delete:observations')
     @login_required
     def edit_or_delete_observation(*args, **kwargs):
         '''
