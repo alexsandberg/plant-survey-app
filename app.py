@@ -146,7 +146,7 @@ def create_app(test_config=None):
         # add login link function to jinja context
         app.jinja_env.globals.update(create_login_link=create_login_link)
 
-        return redirect('dashboard')
+        return redirect('plants')
 
     @app.route('/plants')
     def plants():
