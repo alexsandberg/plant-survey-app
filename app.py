@@ -553,6 +553,28 @@ def create_app(test_config=None):
                 "observation_id": observation_id
             })
 
+    @app.route('/api/plants')
+    def get_plants_api():
+        '''
+        Handles API GET requests for getting all plants. Returns JSON.
+        '''
+
+        # get all plants from database
+        plants = Plant.query.all()
+
+        # 404 if no plants found
+        if len(plants) == 0:
+            abort(404)
+
+        # format each plant
+        plants = format_plants(plants)
+
+        # return plants
+        return jsonify({
+            'success': True,
+            'plants': plants
+        })
+
     # Error Handling
     '''
     Error handling for unprocessable entity
