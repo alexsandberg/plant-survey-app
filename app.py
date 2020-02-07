@@ -8,6 +8,7 @@ from six.moves.urllib.parse import urlencode
 from models import Plant, Observation
 from auth.auth import AuthError, requires_auth, create_login_link
 import constants
+import json
 from dotenv import load_dotenv, find_dotenv
 
 
@@ -360,7 +361,10 @@ def create_app(test_config=None):
         '''
 
         # get all plant observations
-        observations = Observation.query.all()
+        # observations = Observation.query.all()
+        response = get_observations_api()
+        data = json.loads(response.data)
+        observations = data['observations']
 
         # for observation in observations:
         #     print(
@@ -375,11 +379,11 @@ def create_app(test_config=None):
         #     )
 
         # if no observations
-        if not observations:
-            abort(404)
+        # if not observations:
+        #     abort(404)
 
         # format each observation
-        observations = format_observations(observations)
+        # observations = format_observations(observations)
 
         # return observations
         return render_template('pages/observations.html',

@@ -74,7 +74,7 @@ Omit the dropdb command the first time you run tests.
 
 ### Getting Started
 
-* Base URL: The backend is hosted at `https://plant-survey-tool.herokuapp.com/`. Alternatively, follow directions above to run the application locally.
+* Base URL: Plant and observations data can be accessed directly through the API, using the base URL `https://plant-survey-tool.herokuapp.com/api`. Alternatively, follow directions above to run the application locally.
 * Authentication: Most endpoints require either Public or Admin permissions. This version does not require authentication or API keys.
 
 ### Error Handling
