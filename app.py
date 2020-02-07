@@ -186,46 +186,6 @@ def create_app(test_config=None):
         # return new plant form
         return render_template('forms/new_plant.html'), 200
 
-    @app.route('/plants/new', methods=['POST'])
-    @requires_auth('post:plants')
-    @login_required
-    def new_plant(jwt):
-        '''
-        Handles POST requests for adding new plant.
-        '''
-
-        # load plant form data
-        name = request.form['name']
-        latin_name = request.form['latin_name']
-        description = request.form['description']
-        image_link = request.form['image_link']
-
-        # load contributor email from session
-        contributor_email = session['jwt_payload']['email']
-
-        # ensure all fields have data
-        if ((contributor_email is None) or (name == "") or (latin_name == "")
-                or (description == "") or (image_link == "")):
-            abort(422)
-
-        # create a new plant
-        plant = Plant(contributor_email=contributor_email, name=name,
-                      latin_name=latin_name, description=description,
-                      image_link=image_link)
-
-        try:
-            # add plant to the database
-            plant.insert()
-        except Exception as e:
-            print('ERROR: ', str(e))
-            abort(422)
-
-        # flash success message
-        flash(f'Plant {name} successfully created!')
-
-        # return redirect to dashboard
-        return redirect('/dashboard')
-
     @app.route('/plants/<int:id>/edit')
     @requires_auth('edit_or_delete:plants')
     @login_required
@@ -439,8 +399,13 @@ def create_app(test_config=None):
         # get request body
         body = request.get_json()
 
+        # get email from session or body
+        if 'jwt_payload' in session and 'email' in session['jwt_payload']:
+            contributor_email = session['jwt_payload']['email']
+        else:
+            contributor_email = body.get('contributorEmail')
+
         # load plant form data
-        contributor_email = body.get('contributorEmail')
         name = body.get('name')
         latin_name = body.get('latinName')
         description = body.get('description')

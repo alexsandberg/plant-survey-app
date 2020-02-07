@@ -5,8 +5,7 @@
 
 <div class="container">
     <div class="well">
-        <form id="plant-form" class="form-vertical needs-validation" role="form" autocomplete="off" method="POST"
-            action="/plants/new">
+        <form id="plant-form" class="form-vertical needs-validation" role="form" autocomplete="off">
 
             <div class="form-group">
                 <label for="plant-name" class="control-label">Plant Name</label>
@@ -28,12 +27,50 @@
             <div class="pull-right">
                 <br>
                 <div class="btn-group col-xs-12">
-                    <input type="submit" class="btn btn-primary"></input>
+                    <button type="button" class="btn btn-primary" onclick="sendPlantPOST()">Submit</button>
                 </div>
             </div>
 
         </form>
     </div>
 </div>
+
+
+
+<script>
+
+    function sendPlantPOST() {
+        let name = document.getElementById("plant-name").value;
+        let latinName = document.getElementById("plant-latin-name").value;
+        let description = document.getElementById("plant-description").value;
+        let imageLink = document.getElementById("plant-image-link").value;
+
+        let data = {
+            "name": name,
+            "latinName": latinName,
+            "description": description,
+            "imageLink": imageLink
+        }
+
+
+        fetch(`${window.location.origin}/api/plants/new`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((myJson) => {
+                if (myJson['success'] == true) {
+                    window.location.href = '/dashboard';
+                }
+            });
+
+    }
+
+</script>
 
 {% endblock %}
