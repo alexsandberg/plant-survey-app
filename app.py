@@ -360,32 +360,12 @@ def create_app(test_config=None):
         Handles GET requests for getting all observations.
         '''
 
-        # get all plant observations
-        # observations = Observation.query.all()
+        # get all plant observations from API
         response = get_observations_api()
         data = json.loads(response.data)
         observations = data['observations']
 
-        # for observation in observations:
-        #     print(
-        #         'OBSERVATION: \n'
-        #         '{'
-        #         f'"contributorEmail": "{observation.contributor_email}",'
-        #         f'"name": "{observation.name}",'
-        #         f'"date": "{observation.date}",'
-        #         f'"plantID": {observation.plant_id},'
-        #         f'"notes": "{observation.notes}"'
-        #         '}'
-        #     )
-
-        # if no observations
-        # if not observations:
-        #     abort(404)
-
-        # format each observation
-        # observations = format_observations(observations)
-
-        # return observations
+        # return template with observations
         return render_template('pages/observations.html',
                                observations=observations), 200
 
