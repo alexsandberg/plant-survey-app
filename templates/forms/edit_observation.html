@@ -118,7 +118,7 @@
             "notes": notes
         }
 
-        fetch(`/observations/${observationID}/edit`, {
+        fetch(`${window.location.origin}/api/observations/${observationID}/edit`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -141,7 +141,7 @@
         // get the observation id from data
         let observationID = observationData.getAttribute("data-id");
 
-        fetch(`/observations/${observationID}/edit`, {
+        fetch(`${window.location.origin}/api/observations/${observationID}/edit`, {
             method: 'DELETE',
         })
             .then((response) => {

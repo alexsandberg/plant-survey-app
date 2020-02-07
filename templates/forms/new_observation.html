@@ -4,8 +4,7 @@
 
 <div class="container">
     <div class="well">
-        <form id="observation-form" class="form-vertical" role="form" autocomplete="off" method="POST"
-            action="/observations/new?plant={{ plant.id }}">
+        <form id="observation-form" class="form-vertical" role="form" autocomplete="off">
 
             <div class="form-group">
                 <label for="observation_name" class="control-label">Your Name</label>
@@ -29,7 +28,8 @@
             <div class="pull-right">
                 <br>
                 <div class="btn-group col-xs-12">
-                    <input type="submit" class="btn btn-primary"></input>
+                    <!-- <input type="submit" class="btn btn-primary"></input> -->
+                    <button type="button" class="btn btn-primary" onclick="sendObservationPOST()">Submit</button>
                 </div>
             </div>
 
@@ -39,6 +39,7 @@
     <div class="posts-container" id="new-observation-plant-card">
         <div class="plant-post">
             <div class="post-text-container">
+                <div id="plantData" data-id="{{ plant.id }}"></div>
                 <a href="/plants/{{ plant.id }}">
                     <h3>{{ plant.name }}</h3>
                 </a>
@@ -82,6 +83,43 @@
         var datetimeField = document.getElementById("datetimeField");
         datetimeField.value = localDatetime;
     });
+
+
+    function sendObservationPOST() {
+        let name = document.getElementById("observation_name").value;
+        console.log('name: ', name)
+        let date = document.getElementById("datetimeField").value;
+        console.log('date: ', date)
+        let notes = document.getElementById("observation_textarea").value;
+        console.log('notes: ', notes)
+        let plantID = plantData.getAttribute("data-id");
+        console.log('plantID: ', plantID)
+
+        let data = {
+            "name": name,
+            "date": date,
+            "notes": notes,
+            "plantID": plantID
+        }
+
+
+        fetch(`${window.location.origin}/api/observations/new`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((myJson) => {
+                if (myJson['success'] == true) {
+                    window.location.href = '/dashboard';
+                }
+            });
+
+    }
 
 </script>
 

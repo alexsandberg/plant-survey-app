@@ -6,7 +6,7 @@ from os import environ as env
 from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
 from models import Plant, Observation
-from auth.auth import AuthError, requires_auth, create_login_link
+from auth.auth import AuthError, requires_auth, requires_auth_permissions, create_login_link
 import constants
 import json
 from dotenv import load_dotenv, find_dotenv
@@ -83,6 +83,7 @@ def create_app(test_config=None):
     @app.route('/callback')
     def callback_handling():
         token = auth0.authorize_access_token()
+        # print('TOKEN: ', token['access_token'])
         resp = auth0.get('userinfo')
         userinfo = resp.json()
 
@@ -155,47 +156,26 @@ def create_app(test_config=None):
         Handles GET requests for getting all plants.
         '''
 
-        # get all plants from database
-        plants = Plant.query.all()
+        # get all plants from API
+        response = get_plants_api()
+        data = json.loads(response.data)
+        plants = data['plants']
 
-        # for plant in plants:
-        #     print(
-        #         'PLANT: \n'
-        #         '{'
-        #         f'"contributorEmail": "{plant.contributor_email}",'
-        #         f'"name": "{plant.name}",'
-        #         f'"latinName": "{plant.latin_name}",'
-        #         f'"description": "{plant.description}",'
-        #         f'"imageLink": "{plant.image_link}"'
-        #         '}'
-        #     )
-
-        # 404 if no plants found
-        if len(plants) == 0:
-            abort(404)
-
-        # format each plant
-        plants = format_plants(plants)
-
-        # return plants
+        # return template with plants
         return render_template('pages/plants.html',
                                plants=plants), 200
 
     @app.route('/plants/<int:id>')
-    def get_plant_by_id(*args, **kwargs):
-        # get id from kwargs
-        id = kwargs['id']
+    def get_plant_by_id(id):
 
-        # get plant by id
-        plant = Plant.query.filter_by(id=id).one_or_none()
+        # get plant by id from API
+        response = get_plant_by_id_api(id)
+        data = json.loads(response.data)
+        plant = data['plant']
 
-        # abort 404 if no plant found
-        if plant is None:
-            abort(404)
-
-        # serve plant page with formatted plant
+        # serve plant page with plant result
         return render_template('pages/plant.html',
-                               plant=plant.format()), 200
+                               plant=plant), 200
 
     @app.route('/plants/new')
     @login_required
@@ -206,24 +186,142 @@ def create_app(test_config=None):
         # return new plant form
         return render_template('forms/new_plant.html'), 200
 
-    @app.route('/plants/new', methods=['POST'])
-    @requires_auth('post:plants')
+    @app.route('/plants/<int:id>/edit')
+    @requires_auth_permissions('edit_or_delete:plants')
     @login_required
-    def new_plant(jwt):
+    def get_edit_plant_form(*args, **kwargs):
         '''
-        Handles POST requests for adding new plant.
+        Handles GET requests for edit plant form.
         '''
+
+        # get id from kwargs
+        id = kwargs['id']
+
+        # get plant by id
+        plant = Plant.query.filter_by(id=id).one_or_none()
+
+        # return edit plant template with plant info
+        return render_template('forms/edit_plant.html',
+                               plant=plant.format()), 200
+
+    @app.route('/observations')
+    def get_plant_observations():
+        '''
+        Handles GET requests for getting all observations.
+        '''
+
+        # get all plant observations from API
+        response = get_observations_api()
+        data = json.loads(response.data)
+        observations = data['observations']
+
+        # return template with observations
+        return render_template('pages/observations.html',
+                               observations=observations), 200
+
+    @app.route('/observations/new')
+    @login_required
+    def new_observation_form():
+        '''
+        Handles GET requests for new plant form page.
+        '''
+
+        # redirect to observations if plant id not included
+        if 'plant' not in request.args:
+            return redirect('/observations')
+
+        # get args from request
+        plant_id = request.args.get('plant')
+
+        # get plant by id
+        plant = Plant.query.filter_by(id=plant_id).one_or_none()
+
+        # abort 404 if not found
+        if plant is None:
+            abort(404)
+
+        # return new plant form
+        return render_template('forms/new_observation.html',
+                               plant=plant.format()), 200
+
+    @app.route('/observations/<int:id>/edit')
+    @login_required
+    def get_edit_observation_form(*args, **kwargs):
+        '''
+        Handles GET requests for edit observation form.
+        '''
+
+        # get id from kwargs
+        id = kwargs['id']
+
+        # get plant by id
+        observation = Observation.query.filter_by(id=id).one_or_none()
+
+        # return edit plant template with plant info
+        return render_template('forms/edit_observation.html',
+                               observation=observation.format()), 200
+
+    # API ROUTES
+
+    @app.route('/api/plants')
+    def get_plants_api():
+        '''
+        Handles API GET requests for getting all plants. Returns JSON.
+        '''
+
+        # get all plants from database
+        plants = Plant.query.all()
+
+        # 404 if no plants found
+        if len(plants) == 0:
+            abort(404)
+
+        # format each plant
+        plants = format_plants(plants)
+
+        # return plants
+        return jsonify({
+            'success': True,
+            'plants': plants
+        })
+
+    @app.route('/api/plants/<int:id>')
+    def get_plant_by_id_api(id):
+        '''
+        Handles API GET requests for getting plant by ID. Returns JSON.
+        '''
+
+        # get plant by ID
+        plant = Plant.query.filter_by(id=id).one_or_none()
+
+        # 404 if no plants found
+        if plant is None:
+            abort(404)
+
+        # return formatted plant
+        return jsonify({
+            'success': True,
+            'plant': plant.format()
+        })
+
+    @app.route('/api/plants/new', methods=['POST'])
+    @requires_auth_permissions('post:plants')
+    def new_plant_api(jwt):
+
+        # get request body
+        body = request.get_json()
+
+        # get email from session or body
+        if 'jwt_payload' in session and 'email' in session['jwt_payload']:
+            contributor_email = session['jwt_payload']['email']
+        else:
+            contributor_email = body.get('contributorEmail')
 
         # load plant form data
-        name = request.form['name']
-        latin_name = request.form['latin_name']
-        description = request.form['description']
-        image_link = request.form['image_link']
-
-        print('DATA: ', name, latin_name, description, image_link)
-
-        # load contributor email from session
-        contributor_email = session['jwt_payload']['email']
+        name = body.get('name')
+        latin_name = body.get('latinName')
+        description = body.get('description')
+        image_link = body.get('imageLink')
 
         # ensure all fields have data
         if ((contributor_email is None) or (name == "") or (latin_name == "")
@@ -245,32 +343,16 @@ def create_app(test_config=None):
         # flash success message
         flash(f'Plant {name} successfully created!')
 
-        # return redirect to dashboard
-        return redirect('/dashboard')
+        return jsonify({
+            'success': True,
+            'plant': plant.format()
+        })
 
-    @app.route('/plants/<int:id>/edit')
-    @requires_auth('edit_or_delete:plants')
-    @login_required
-    def get_edit_plant_form(*args, **kwargs):
+    @app.route('/api/plants/<int:id>/edit', methods=['PATCH', 'DELETE'])
+    @requires_auth_permissions('edit_or_delete:plants')
+    def edit_or_delete_plant_api(*args, **kwargs):
         '''
-        Handles GET requests for edit plant form.
-        '''
-
-        # get id from kwargs
-        id = kwargs['id']
-
-        # get plant by id
-        plant = Plant.query.filter_by(id=id).one_or_none()
-
-        # return edit plant template with plant info
-        return render_template('forms/edit_plant.html', plant=plant.format()), 200
-
-    @app.route('/plants/<int:id>/edit', methods=['PATCH', 'DELETE'])
-    @requires_auth('edit_or_delete:plants')
-    @login_required
-    def edit_or_delete_plant(*args, **kwargs):
-        '''
-        Handles PATCH and DELETE requests for plants.
+        Handles API PATCH and DELETE requests for plants.
         '''
 
         # get id from kwargs
@@ -325,7 +407,8 @@ def create_app(test_config=None):
 
             # return plant if success
             return jsonify({
-                "success": True
+                "success": True,
+                "plant": plant.format()
             })
 
         # if DELETE
@@ -351,90 +434,79 @@ def create_app(test_config=None):
 
             # return if successfully deleted
             return jsonify({
-                "success": True
+                "success": True,
+                "plant_name": plant_name,
+                "plant_id": id
             })
 
-    @app.route('/observations')
-    def get_plant_observations():
+    @app.route('/api/observations')
+    def get_observations_api():
         '''
-        Handles GET requests for getting all observations.
-        '''
-
-        # get all plant observations
-        # observations = Observation.query.all()
-        response = get_observations_api()
-        data = json.loads(response.data)
-        observations = data['observations']
-
-        # for observation in observations:
-        #     print(
-        #         'OBSERVATION: \n'
-        #         '{'
-        #         f'"contributorEmail": "{observation.contributor_email}",'
-        #         f'"name": "{observation.name}",'
-        #         f'"date": "{observation.date}",'
-        #         f'"plantID": {observation.plant_id},'
-        #         f'"notes": "{observation.notes}"'
-        #         '}'
-        #     )
-
-        # if no observations
-        # if not observations:
-        #     abort(404)
-
-        # format each observation
-        # observations = format_observations(observations)
-
-        # return observations
-        return render_template('pages/observations.html',
-                               observations=observations), 200
-
-    @app.route('/observations/new')
-    @login_required
-    def new_observation_form():
-        '''
-        Handles GET requests for new plant form page.
+        Handles API GET requests for getting all observations. Returns JSON.
         '''
 
-        # redirect to observations if plant id not included
-        if 'plant' not in request.args:
-            return redirect('/observations')
+        # get all observations from database
+        observations = Observation.query.all()
 
-        # get args from request
-        plant_id = request.args.get('plant')
-
-        # get plant by id
-        plant = Plant.query.filter_by(id=plant_id).one_or_none()
-
-        # abort 404 if not found
-        if plant is None:
+        # 404 if no observations found
+        if len(observations) == 0:
             abort(404)
 
-        # return new plant form
-        return render_template('forms/new_observation.html',
-                               plant=plant.format()), 200
+        # format each observation
+        observations = format_observations(observations)
 
-    @app.route('/observations/new', methods=['POST'])
-    # @requires_auth('post:observations')
-    @login_required
-    def post_plant_observation():
+        # return observations
+        return jsonify({
+            'success': True,
+            'observations': observations
+        })
+
+    @app.route('/api/observations/<int:id>')
+    def get_observation_by_id_api(id):
         '''
-        Handles POST requests for adding new observation.
+        Handles API GET requests for getting observation by id. Returns JSON.
         '''
 
-        # load data from request and session
-        contributor_email = session['jwt_payload']['email']
-        plant_id = request.args.get('plant')
-        name = request.form['name']
-        date = request.form['date']
-        notes = request.form['notes']
+        # get observation from database by id
+        observation = Observation.query.filter_by(id=id).one_or_none()
+
+        # 404 if no observation found
+        if observation is None:
+            abort(404)
+
+        # return formatted observation
+        return jsonify({
+            'success': True,
+            'observation': observation.format()
+        })
+
+    @app.route('/api/observations/new', methods=['POST'])
+    def post_plant_observation_api():
+        '''
+        Handles API POST requests for adding new observation.
+        '''
+
+        # get request body
+        body = request.get_json()
+
+        # get email from session or body
+        if 'jwt_payload' in session and 'email' in session['jwt_payload']:
+            contributor_email = session['jwt_payload']['email']
+        else:
+            contributor_email = body.get('contributorEmail')
+
+        # load observation body data
+        plant_id = body.get('plantID')
+        name = body.get('name')
+        date = body.get('date')
+        notes = body.get('notes')
 
         # ensure required fields have data
         if ((contributor_email is None) or (name == '') or (date == '')
                 or (plant_id == '')):
             abort(422)
 
-        # create a new plant
+        # create a new observation
         observation = Observation(contributor_email=contributor_email,
                                   name=name, date=date, plant_id=plant_id,
                                   notes=notes)
@@ -449,37 +521,17 @@ def create_app(test_config=None):
         # flash success message
         flash('Observation successfully created!')
 
-        # return redirect to dashboard
-        return redirect('/dashboard')
+        # return observation
+        return jsonify({
+            'success': True,
+            'observation': observation.format()
+        })
 
-    @app.route('/observations/<int:id>/edit')
-    # @requires_auth('edit_or_delete:observations')
-    @login_required
-    def get_edit_observation_form(*args, **kwargs):
-        '''
-        Handles GET requests for edit observation form.
-        '''
-
-        # get id from kwargs
-        id = kwargs['id']
-
-        # get plant by id
-        observation = Observation.query.filter_by(id=id).one_or_none()
-
-        # return edit plant template with plant info
-        return render_template('forms/edit_observation.html',
-                               observation=observation.format()), 200
-
-    @app.route('/observations/<int:id>/edit', methods=['PATCH', 'DELETE'])
-    # @requires_auth('edit_or_delete:observations')
-    @login_required
-    def edit_or_delete_observation(*args, **kwargs):
+    @app.route('/api/observations/<int:id>/edit', methods=['PATCH', 'DELETE'])
+    def edit_or_delete_observation_api(id):
         '''
         Handles PATCH and DELETE requests for observations.
         '''
-
-        # get id from kwargs
-        id = kwargs['id']
 
         # get observation by id
         observation = Observation.query.filter_by(id=id).one_or_none()
@@ -510,9 +562,6 @@ def create_app(test_config=None):
 
             if body.get('date'):
                 observation.date = body.get('date')
-
-            if body.get('plantID'):
-                observation.plant_id = body.get('plantID')
 
             if body.get('notes'):
                 observation.notes = body.get('notes')
@@ -556,90 +605,6 @@ def create_app(test_config=None):
                 "observation_name": observation_name,
                 "observation_id": observation_id
             })
-
-    # API ROUTES
-
-    @app.route('/api/plants')
-    def get_plants_api():
-        '''
-        Handles API GET requests for getting all plants. Returns JSON.
-        '''
-
-        # get all plants from database
-        plants = Plant.query.all()
-
-        # 404 if no plants found
-        if len(plants) == 0:
-            abort(404)
-
-        # format each plant
-        plants = format_plants(plants)
-
-        # return plants
-        return jsonify({
-            'success': True,
-            'plants': plants
-        })
-
-    @app.route('/api/plants/<int:id>')
-    def get_plant_by_id_api(id):
-        '''
-        Handles API GET requests for getting plant by ID. Returns JSON.
-        '''
-
-        # get plant by ID
-        plant = Plant.query.filter_by(id=id).one_or_none()
-
-        # 404 if no plants found
-        if plant is None:
-            abort(404)
-
-        # return formatted plant
-        return jsonify({
-            'success': True,
-            'plant': plant.format()
-        })
-
-    @app.route('/api/observations')
-    def get_observations_api():
-        '''
-        Handles API GET requests for getting all observations. Returns JSON.
-        '''
-
-        # get all observations from database
-        observations = Observation.query.all()
-
-        # 404 if no observations found
-        if len(observations) == 0:
-            abort(404)
-
-        # format each observation
-        observations = format_observations(observations)
-
-        # return observations
-        return jsonify({
-            'success': True,
-            'observations': observations
-        })
-
-    @app.route('/api/observations/<int:id>')
-    def get_observation_by_id_api(id):
-        '''
-        Handles API GET requests for getting all observations. Returns JSON.
-        '''
-
-        # get observation from database by id
-        observation = Observation.query.filter_by(id=id).one_or_none()
-
-        # 404 if no observation found
-        if observation is None:
-            abort(404)
-
-        # return formatted observation
-        return jsonify({
-            'success': True,
-            'observation': observation.format()
-        })
 
     # Error Handling
     '''
