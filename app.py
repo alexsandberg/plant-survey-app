@@ -6,7 +6,7 @@ from os import environ as env
 from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
 from models import Plant, Observation
-from auth.auth import AuthError, requires_auth, create_login_link
+from auth.auth import AuthError, requires_auth, requires_auth_permissions, create_login_link
 import constants
 import json
 from dotenv import load_dotenv, find_dotenv
@@ -187,7 +187,7 @@ def create_app(test_config=None):
         return render_template('forms/new_plant.html'), 200
 
     @app.route('/plants/<int:id>/edit')
-    @requires_auth('edit_or_delete:plants')
+    @requires_auth_permissions('edit_or_delete:plants')
     @login_required
     def get_edit_plant_form(*args, **kwargs):
         '''
@@ -245,7 +245,6 @@ def create_app(test_config=None):
                                plant=plant.format()), 200
 
     @app.route('/observations/<int:id>/edit')
-    # @requires_auth('edit_or_delete:observations')
     @login_required
     def get_edit_observation_form(*args, **kwargs):
         '''
@@ -306,7 +305,7 @@ def create_app(test_config=None):
         })
 
     @app.route('/api/plants/new', methods=['POST'])
-    @requires_auth('post:plants')
+    @requires_auth_permissions('post:plants')
     def new_plant_api(jwt):
 
         # get request body
@@ -350,7 +349,7 @@ def create_app(test_config=None):
         })
 
     @app.route('/api/plants/<int:id>/edit', methods=['PATCH', 'DELETE'])
-    @requires_auth('edit_or_delete:plants')
+    @requires_auth_permissions('edit_or_delete:plants')
     def edit_or_delete_plant_api(*args, **kwargs):
         '''
         Handles API PATCH and DELETE requests for plants.

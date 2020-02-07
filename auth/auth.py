@@ -162,9 +162,9 @@ def verify_decode_jwt(token):
     }, 400)
 
 
-def requires_auth(permission=''):
+def requires_auth_permissions(permission=''):
     '''
-    Decorator fucntion used for adding authorization to endpoints
+    Decorator fucntion used for adding authorization to endpoints with permissions
     '''
     def requires_auth_decorator(f):
         @wraps(f)
@@ -181,6 +181,29 @@ def requires_auth(permission=''):
 
             # check user permissions
             check_permissions(permission, payload)
+            return f(payload, *args, **kwargs)
+
+        return wrapper
+    return requires_auth_decorator
+
+
+def requires_auth():
+    '''
+    Decorator fucntion used for adding authorization to endpoints
+    '''
+    def requires_auth_decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+
+            # get token from session or header
+            if constants.JWT in session:
+                token = session[constants.JWT]
+            else:
+                token = get_token_auth_header()
+
+            # decode and validate token
+            payload = verify_decode_jwt(token)
+
             return f(payload, *args, **kwargs)
 
         return wrapper
