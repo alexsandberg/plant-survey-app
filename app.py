@@ -83,6 +83,7 @@ def create_app(test_config=None):
     @app.route('/callback')
     def callback_handling():
         token = auth0.authorize_access_token()
+        # print('TOKEN: ', token['access_token'])
         resp = auth0.get('userinfo')
         userinfo = resp.json()
 
@@ -198,8 +199,6 @@ def create_app(test_config=None):
         latin_name = request.form['latin_name']
         description = request.form['description']
         image_link = request.form['image_link']
-
-        print('DATA: ', name, latin_name, description, image_link)
 
         # load contributor email from session
         contributor_email = session['jwt_payload']['email']
@@ -554,6 +553,42 @@ def create_app(test_config=None):
             abort(404)
 
         # return formatted plant
+        return jsonify({
+            'success': True,
+            'plant': plant.format()
+        })
+
+    @app.route('/api/plants/new', methods=['POST'])
+    @requires_auth('post:plants')
+    def new_plant_api(jwt):
+
+        # get request body
+        body = request.get_json()
+
+        # load plant form data
+        contributor_email = body.get('contributorEmail')
+        name = body.get('name')
+        latin_name = body.get('latinName')
+        description = body.get('description')
+        image_link = body.get('imageLink')
+
+        # ensure all fields have data
+        if ((contributor_email is None) or (name == "") or (latin_name == "")
+                or (description == "") or (image_link == "")):
+            abort(422)
+
+        # create a new plant
+        plant = Plant(contributor_email=contributor_email, name=name,
+                      latin_name=latin_name, description=description,
+                      image_link=image_link)
+
+        try:
+            # add plant to the database
+            plant.insert()
+        except Exception as e:
+            print('ERROR: ', str(e))
+            abort(422)
+
         return jsonify({
             'success': True,
             'plant': plant.format()
