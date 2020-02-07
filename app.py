@@ -563,9 +563,6 @@ def create_app(test_config=None):
             if body.get('date'):
                 observation.date = body.get('date')
 
-            if body.get('plantID'):
-                observation.plant_id = body.get('plantID')
-
             if body.get('notes'):
                 observation.notes = body.get('notes')
 
