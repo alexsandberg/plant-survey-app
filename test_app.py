@@ -19,7 +19,7 @@ class PlantTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "plant_survey"
+        self.database_name = "plant_survey_test"
         self.database_path = "postgres://{}/{}".format(
             'localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
@@ -48,7 +48,8 @@ class PlantTestCase(unittest.TestCase):
     # creates test plant
     def create_test_plant(self):
         # create and insert new plant
-        plant = Plant(name=self.test_plant['name'],
+        plant = Plant(contributor_email=self.test_plant['contributorEmail'],
+                      name=self.test_plant['name'],
                       latin_name=self.test_plant['latinName'],
                       description=self.test_plant['description'],
                       image_link=self.test_plant['imageLink'])
@@ -59,7 +60,9 @@ class PlantTestCase(unittest.TestCase):
     # creates new test observation
     def create_test_observation(self, plant_id):
         # create and insert new observation
-        observation = Observation(name=self.test_observation['name'],
+        observation = Observation(contributor_email=self.test_observation
+                                  ['contributorEmail'],
+                                  name=self.test_observation['name'],
                                   date=self.test_observation['date'],
                                   plant_id=plant_id,
                                   notes=self.test_observation['notes'])
@@ -84,6 +87,7 @@ class PlantTestCase(unittest.TestCase):
 
     # sample plant for use in tests
     test_plant = {
+        'contributorEmail': gen_random_string(),
         'name': gen_random_string(),
         'latinName': gen_random_string(),
         'description': gen_random_string(),
@@ -92,6 +96,7 @@ class PlantTestCase(unittest.TestCase):
 
     # sample observation for use in tests
     test_observation = {
+        'contributorEmail': gen_random_string(),
         'name': gen_random_string(),
         'date': datetime.datetime.now(),
         'notes': gen_random_string()
@@ -106,7 +111,7 @@ class PlantTestCase(unittest.TestCase):
         self.clear_database()
 
         # get response and load data
-        response = self.client().get('/plants')
+        response = self.client().get('/api/plants')
         data = json.loads(response.data)
 
         # check status code and message
@@ -121,7 +126,7 @@ class PlantTestCase(unittest.TestCase):
         self.create_test_plant()
 
         # get response and load data
-        response = self.client().get('/plants')
+        response = self.client().get('/api/plants')
         data = json.loads(response.data)
 
         # check status code and message
@@ -138,7 +143,7 @@ class PlantTestCase(unittest.TestCase):
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
 
         # get response and load data
-        response = self.client().post('/plants/new', json=self.test_plant,
+        response = self.client().post('/api/plants/new', json=self.test_plant,
                                       headers=headers)
         data = json.loads(response.data)
 
@@ -153,7 +158,7 @@ class PlantTestCase(unittest.TestCase):
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
 
         # get response with empty json and load data
-        response = self.client().post('/plants/new', json={},
+        response = self.client().post('/api/plants/new', json={},
                                       headers=headers)
         data = json.loads(response.data)
 
@@ -180,7 +185,7 @@ class PlantTestCase(unittest.TestCase):
         }
 
         # get response with updated name json and load data
-        response = self.client().patch('/plants/{}'.format(plant_id),
+        response = self.client().patch('/api/plants/{}/edit'.format(plant_id),
                                        json=request_data,
                                        headers=headers)
         data = json.loads(response.data)
@@ -208,7 +213,7 @@ class PlantTestCase(unittest.TestCase):
         }
 
         # get response with malformed json and load data
-        response = self.client().patch('/plants/{}'.format(plant_id),
+        response = self.client().patch('/api/plants/{}/edit'.format(plant_id),
                                        json=request_data,
                                        headers=headers)
         data = json.loads(response.data)
@@ -226,7 +231,7 @@ class PlantTestCase(unittest.TestCase):
 
         # DELETE
         # attempt to delete nonexisting plant and store response
-        response = self.client().delete('/plants/1000',
+        response = self.client().delete('/api/plants/1000/edit',
                                         headers=headers)
         data = json.loads(response.data)
 
@@ -237,7 +242,7 @@ class PlantTestCase(unittest.TestCase):
 
         # PATCH
         # attempt to patch nonexisting plant and store response
-        response = self.client().patch('/plants/1000',
+        response = self.client().patch('/api/plants/1000/edit',
                                        headers=headers)
         data = json.loads(response.data)
 
@@ -256,7 +261,7 @@ class PlantTestCase(unittest.TestCase):
         headers = self.create_auth_headers(token=self.ADMIN_ROLE_TOKEN)
 
         # delete the plant and store response
-        response = self.client().delete('/plants/{}'.format(plant_id),
+        response = self.client().delete('/api/plants/{}/edit'.format(plant_id),
                                         headers=headers)
         data = json.loads(response.data)
 
@@ -277,7 +282,7 @@ class PlantTestCase(unittest.TestCase):
         self.clear_database()
 
         # get response and load data
-        response = self.client().get('/observations')
+        response = self.client().get('/api/observations')
         data = json.loads(response.data)
 
         # check status code and message
@@ -297,7 +302,7 @@ class PlantTestCase(unittest.TestCase):
         self.create_test_observation(plant_id)
 
         # get response and load data
-        response = self.client().get('/observations')
+        response = self.client().get('/api/observations')
         data = json.loads(response.data)
 
         # check status code and message
@@ -311,13 +316,14 @@ class PlantTestCase(unittest.TestCase):
         """Tests POST observation success"""
 
         # get headers using PUBLIC token
-        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+        # headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
 
         # create new plant for observation
         plant_id = self.create_test_plant()
 
         # create a new observation json using test plant
         observation = {
+            'contributorEmail': self.test_observation['contributorEmail'],
             'name': self.test_observation['name'],
             'date': self.test_observation['date'],
             'plantID': plant_id,
@@ -325,9 +331,8 @@ class PlantTestCase(unittest.TestCase):
         }
 
         # get response and load data
-        response = self.client().post('/observations',
-                                      json=observation,
-                                      headers=headers)
+        response = self.client().post('/api/observations/new',
+                                      json=observation)
         data = json.loads(response.data)
 
         # check status code and message
@@ -338,13 +343,13 @@ class PlantTestCase(unittest.TestCase):
         """Tests POST observation failure"""
 
         # get headers using PUBLIC token
-        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+        # headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
 
         # send request using test_observation, which is missing plant_id
         # get response and load data
-        response = self.client().post('/observations',
-                                      json=self.test_observation,
-                                      headers=headers)
+        response = self.client().post('/api/observations/new',
+                                      json=self.test_observation)
+
         data = json.loads(response.data)
 
         # check status code and message
@@ -362,7 +367,7 @@ class PlantTestCase(unittest.TestCase):
         observation_id = self.create_test_observation(plant_id)
 
         # get headers using PUBLIC token
-        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+        # headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
 
         # set json data for observation patch with updated name
         request_data = {
@@ -373,10 +378,9 @@ class PlantTestCase(unittest.TestCase):
         }
 
         # get response with updated name json and load data
-        response = self.client().patch('/observations/{}'
+        response = self.client().patch('/api/observations/{}/edit'
                                        .format(observation_id),
-                                       json=request_data,
-                                       headers=headers)
+                                       json=request_data)
         data = json.loads(response.data)
 
         # check status code and message
@@ -394,7 +398,7 @@ class PlantTestCase(unittest.TestCase):
         observation_id = self.create_test_observation(plant_id)
 
         # get headers using PUBLIC token
-        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+        # headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
 
         # set malformed json data for observation patch - name key missing
         request_data = {
@@ -404,10 +408,9 @@ class PlantTestCase(unittest.TestCase):
         }
 
         # get response with updated name json and load data
-        response = self.client().patch('/observations/{}'
+        response = self.client().patch('/api/observations/{}/edit'
                                        .format(observation_id),
-                                       json=request_data,
-                                       headers=headers)
+                                       json=request_data)
         data = json.loads(response.data)
 
         # check status code and message
@@ -425,12 +428,11 @@ class PlantTestCase(unittest.TestCase):
         observation_id = self.create_test_observation(plant_id)
 
         # get headers using PUBLIC token
-        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+        # headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
 
         # get response with updated name json and load data
-        response = self.client().delete('/observations/{}'
-                                        .format(observation_id),
-                                        headers=headers)
+        response = self.client().delete('/api/observations/{}/edit'
+                                        .format(observation_id))
         data = json.loads(response.data)
 
         # check status code and message
@@ -446,12 +448,12 @@ class PlantTestCase(unittest.TestCase):
         """Tests 404 not found error for PATCH or DELETE observation"""
 
         # get headers using PUBLIC token
-        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+        # headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
 
         # DELETE
         # attempt to delete nonexisting observation and store response
-        response = self.client().delete('/observations/1000',
-                                        headers=headers)
+        response = self.client().delete('/api/observations/1000/edit')
+
         data = json.loads(response.data)
 
         # check status code and message
@@ -461,8 +463,7 @@ class PlantTestCase(unittest.TestCase):
 
         # PATCH
         # attempt to patch nonexisting observation and store response
-        response = self.client().patch('/observations/1000',
-                                       headers=headers)
+        response = self.client().patch('/api/observations/1000/edit')
         data = json.loads(response.data)
 
         # check status code and message
@@ -472,21 +473,21 @@ class PlantTestCase(unittest.TestCase):
 
     # AUTH tests
 
-    def test_permission_not_found(self):
-        """Tests AuthError – permission not found"""
+    # def test_permission_not_found(self):
+    #     """Tests AuthError – permission not found"""
 
-        # get headers using PUBLIC token
-        headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
+    #     # get headers using PUBLIC token
+    #     # headers = self.create_auth_headers(token=self.PUBLIC_ROLE_TOKEN)
 
-        # attempt to post new plant (requires Admin role)
-        response = self.client().post('/plants/new', json=self.test_plant,
-                                      headers=headers)
-        data = json.loads(response.data)
+    #     # attempt to post new plant (requires Admin role)
+    #     response = self.client().post('/plants/new', json=self.test_plant,
+    #                                   headers=headers)
+    #     data = json.loads(response.data)
 
-        # check status code and message
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(data['code'], 'unauthorized')
-        self.assertEqual(data['description'], 'Permission not found.')
+    #     # check status code and message
+    #     self.assertEqual(response.status_code, 401)
+    #     self.assertEqual(data['code'], 'unauthorized')
+    #     self.assertEqual(data['description'], 'Permission not found.')
 
     def test_auth_header_missing(self):
         """Tests AuthError - auth header missing"""

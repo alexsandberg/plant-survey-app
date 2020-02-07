@@ -537,8 +537,6 @@ def create_app(test_config=None):
         # get observation by id
         observation = Observation.query.filter_by(id=id).one_or_none()
 
-        print('observation: ', observation)
-
         # abort 404 if no observation found
         if observation is None:
             abort(404)
