@@ -262,93 +262,6 @@ def create_app(test_config=None):
         return render_template('forms/edit_observation.html',
                                observation=observation.format()), 200
 
-    @app.route('/observations/<int:id>/edit', methods=['PATCH', 'DELETE'])
-    # @requires_auth('edit_or_delete:observations')
-    @login_required
-    def edit_or_delete_observation(*args, **kwargs):
-        '''
-        Handles PATCH and DELETE requests for observations.
-        '''
-
-        # get id from kwargs
-        id = kwargs['id']
-
-        # get observation by id
-        observation = Observation.query.filter_by(id=id).one_or_none()
-
-        # abort 404 if no observation found
-        if observation is None:
-            abort(404)
-
-        # if PATCH
-        if request.method == 'PATCH':
-
-            # get request body
-            body = request.get_json()
-
-            # get all keys from request body
-            body_keys = []
-            for key in body:
-                body_keys.append(key)
-
-            # make sure correct keys are present
-            if sorted(body_keys) != sorted(['name', 'date', 'notes']):
-                abort(422)
-
-            # update observation with data from body
-            # contributor_email is not allowed to be updated
-            if body.get('name'):
-                observation.name = body.get('name')
-
-            if body.get('date'):
-                observation.date = body.get('date')
-
-            if body.get('plantID'):
-                observation.plant_id = body.get('plantID')
-
-            if body.get('notes'):
-                observation.notes = body.get('notes')
-
-            try:
-                # update observation in database
-                observation.insert()
-            except Exception as e:
-                print('ERROR: ', str(e))
-                abort(422)
-
-            # flash success message
-            flash('Observation successfully updated!')
-
-            # return observation if success
-            return jsonify({
-                "success": True,
-                "observation": observation.format()
-            })
-
-        # if DELETE
-        if request.method == 'DELETE':
-
-            # save observation name and id
-            observation_name = observation.name
-            observation_id = observation.id
-
-            try:
-                # delete observation from the database
-                observation.delete()
-            except Exception as e:
-                print('ERROR: ', str(e))
-                abort(422)
-
-            # flash success message
-            flash('Observation successfully deleted!')
-
-            # return success
-            return jsonify({
-                "success": True,
-                "observation_name": observation_name,
-                "observation_id": observation_id
-            })
-
     # API ROUTES
 
     @app.route('/api/plants')
@@ -549,7 +462,7 @@ def create_app(test_config=None):
     @app.route('/api/observations/<int:id>')
     def get_observation_by_id_api(id):
         '''
-        Handles API GET requests for getting all observations. Returns JSON.
+        Handles API GET requests for getting observation by id. Returns JSON.
         '''
 
         # get observation from database by id
@@ -608,6 +521,90 @@ def create_app(test_config=None):
             'success': True,
             'observation': observation.format()
         })
+
+    @app.route('/api/observations/<int:id>/edit', methods=['PATCH', 'DELETE'])
+    def edit_or_delete_observation_api(id):
+        '''
+        Handles PATCH and DELETE requests for observations.
+        '''
+
+        # get observation by id
+        observation = Observation.query.filter_by(id=id).one_or_none()
+
+        print('observation: ', observation)
+
+        # abort 404 if no observation found
+        if observation is None:
+            abort(404)
+
+        # if PATCH
+        if request.method == 'PATCH':
+
+            # get request body
+            body = request.get_json()
+
+            # get all keys from request body
+            body_keys = []
+            for key in body:
+                body_keys.append(key)
+
+            # make sure correct keys are present
+            if sorted(body_keys) != sorted(['name', 'date', 'notes']):
+                abort(422)
+
+            # update observation with data from body
+            # contributor_email is not allowed to be updated
+            if body.get('name'):
+                observation.name = body.get('name')
+
+            if body.get('date'):
+                observation.date = body.get('date')
+
+            if body.get('plantID'):
+                observation.plant_id = body.get('plantID')
+
+            if body.get('notes'):
+                observation.notes = body.get('notes')
+
+            try:
+                # update observation in database
+                observation.insert()
+            except Exception as e:
+                print('ERROR: ', str(e))
+                abort(422)
+
+            # flash success message
+            flash('Observation successfully updated!')
+
+            # return observation if success
+            return jsonify({
+                "success": True,
+                "observation": observation.format()
+            })
+
+        # if DELETE
+        if request.method == 'DELETE':
+
+            # save observation name and id
+            observation_name = observation.name
+            observation_id = observation.id
+
+            try:
+                # delete observation from the database
+                observation.delete()
+            except Exception as e:
+                print('ERROR: ', str(e))
+                abort(422)
+
+            # flash success message
+            flash('Observation successfully deleted!')
+
+            # return success
+            return jsonify({
+                "success": True,
+                "observation_name": observation_name,
+                "observation_id": observation_id
+            })
 
     # Error Handling
     '''
