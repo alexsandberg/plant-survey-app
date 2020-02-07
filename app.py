@@ -165,20 +165,16 @@ def create_app(test_config=None):
                                plants=plants), 200
 
     @app.route('/plants/<int:id>')
-    def get_plant_by_id(*args, **kwargs):
-        # get id from kwargs
-        id = kwargs['id']
+    def get_plant_by_id(id):
 
-        # get plant by id
-        plant = Plant.query.filter_by(id=id).one_or_none()
+        # get plant by id from API
+        response = get_plant_by_id_api(id)
+        data = json.loads(response.data)
+        plant = data['plant']
 
-        # abort 404 if no plant found
-        if plant is None:
-            abort(404)
-
-        # serve plant page with formatted plant
+        # serve plant page with plant result
         return render_template('pages/plant.html',
-                               plant=plant.format()), 200
+                               plant=plant), 200
 
     @app.route('/plants/new')
     @login_required
