@@ -102,7 +102,7 @@
             "imageLink": imageLink
         }
 
-        fetch(`/plants/${plantID}/edit`, {
+        fetch(`${window.location.origin}/api/plants/${plantID}/edit`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -125,7 +125,7 @@
         // get the plant id from data
         let plantID = plantData.getAttribute("data-id");
 
-        fetch(`/plants/${plantID}/edit`, {
+        fetch(`${window.location.origin}/api/plants/${plantID}/edit`, {
             method: 'DELETE',
         })
             .then((response) => {

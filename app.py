@@ -241,96 +241,8 @@ def create_app(test_config=None):
         plant = Plant.query.filter_by(id=id).one_or_none()
 
         # return edit plant template with plant info
-        return render_template('forms/edit_plant.html', plant=plant.format()), 200
-
-    @app.route('/plants/<int:id>/edit', methods=['PATCH', 'DELETE'])
-    @requires_auth('edit_or_delete:plants')
-    @login_required
-    def edit_or_delete_plant(*args, **kwargs):
-        '''
-        Handles PATCH and DELETE requests for plants.
-        '''
-
-        # get id from kwargs
-        id = kwargs['id']
-
-        # get plant by id
-        plant = Plant.query.filter_by(id=id).one_or_none()
-
-        # abort 404 if no plant found
-        if plant is None:
-            abort(404)
-
-        # if PATCH
-        if request.method == 'PATCH':
-
-            # get request body
-            body = request.get_json()
-
-            # get all keys from request body
-            body_keys = []
-            for key in body:
-                body_keys.append(key)
-
-            # make sure correct keys are present
-            if sorted(body_keys) != sorted(['name', 'latinName', 'description',
-                                            'imageLink']):
-                abort(422)
-
-            # update plant with data from body
-            # contributor_email is not allowed to be updated
-            if body.get('name'):
-                plant.name = body.get('name')
-
-            if body.get('latinName'):
-                plant.latin_name = body.get('latinName')
-
-            if body.get('description'):
-                plant.description = body.get('description')
-
-            if body.get('imageLink'):
-                plant.image_link = body.get('imageLink')
-
-            try:
-                # update plant in database
-                plant.insert()
-            except Exception as e:
-                print('ERROR: ', str(e))
-                abort(422)
-
-            # flash success message
-            flash(f'Plant {plant.name} successfully updated.')
-
-            # return plant if success
-            return jsonify({
-                "success": True
-            })
-
-        # if DELETE
-        if request.method == 'DELETE':
-
-            # save plant name
-            plant_name = plant.name
-
-            # first delete all observations related to plant
-            observations = Observation.query.filter_by(plant_id=id).all()
-            for observation in observations:
-                observation.delete()
-
-            try:
-                # delete plant from the database
-                plant.delete()
-            except Exception as e:
-                print('ERROR: ', str(e))
-                abort(422)
-
-            # flash success message
-            flash(f'Plant {plant_name} successfully deleted.')
-
-            # return if successfully deleted
-            return jsonify({
-                "success": True
-            })
+        return render_template('forms/edit_plant.html',
+                               plant=plant.format()), 200
 
     @app.route('/observations')
     def get_plant_observations():
@@ -593,6 +505,97 @@ def create_app(test_config=None):
             'success': True,
             'plant': plant.format()
         })
+
+    @app.route('/api/plants/<int:id>/edit', methods=['PATCH', 'DELETE'])
+    @requires_auth('edit_or_delete:plants')
+    def edit_or_delete_plant_api(*args, **kwargs):
+        '''
+        Handles API PATCH and DELETE requests for plants.
+        '''
+
+        # get id from kwargs
+        id = kwargs['id']
+
+        # get plant by id
+        plant = Plant.query.filter_by(id=id).one_or_none()
+
+        # abort 404 if no plant found
+        if plant is None:
+            abort(404)
+
+        # if PATCH
+        if request.method == 'PATCH':
+
+            # get request body
+            body = request.get_json()
+
+            # get all keys from request body
+            body_keys = []
+            for key in body:
+                body_keys.append(key)
+
+            # make sure correct keys are present
+            if sorted(body_keys) != sorted(['name', 'latinName', 'description',
+                                            'imageLink']):
+                abort(422)
+
+            # update plant with data from body
+            # contributor_email is not allowed to be updated
+            if body.get('name'):
+                plant.name = body.get('name')
+
+            if body.get('latinName'):
+                plant.latin_name = body.get('latinName')
+
+            if body.get('description'):
+                plant.description = body.get('description')
+
+            if body.get('imageLink'):
+                plant.image_link = body.get('imageLink')
+
+            try:
+                # update plant in database
+                plant.insert()
+            except Exception as e:
+                print('ERROR: ', str(e))
+                abort(422)
+
+            # flash success message
+            flash(f'Plant {plant.name} successfully updated.')
+
+            # return plant if success
+            return jsonify({
+                "success": True,
+                "plant": plant.format()
+            })
+
+        # if DELETE
+        if request.method == 'DELETE':
+
+            # save plant name
+            plant_name = plant.name
+
+            # first delete all observations related to plant
+            observations = Observation.query.filter_by(plant_id=id).all()
+            for observation in observations:
+                observation.delete()
+
+            try:
+                # delete plant from the database
+                plant.delete()
+            except Exception as e:
+                print('ERROR: ', str(e))
+                abort(422)
+
+            # flash success message
+            flash(f'Plant {plant_name} successfully deleted.')
+
+            # return if successfully deleted
+            return jsonify({
+                "success": True,
+                "plant_name": plant_name,
+                "plant_id": id
+            })
 
     @app.route('/api/observations')
     def get_observations_api():
