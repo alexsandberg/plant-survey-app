@@ -18,6 +18,7 @@ __pycache__
 .vscode/*
 setup.sh
 notes.txt
+plant_survey_backup.psql
 
 # Coverage reports
 htmlcov/
