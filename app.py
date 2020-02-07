@@ -341,6 +341,9 @@ def create_app(test_config=None):
             print('ERROR: ', str(e))
             abort(422)
 
+        # flash success message
+        flash(f'Plant {name} successfully created!')
+
         return jsonify({
             'success': True,
             'plant': plant.format()
@@ -515,6 +518,9 @@ def create_app(test_config=None):
         except Exception as e:
             print('ERROR: ', str(e))
             abort(422)
+
+        # flash success message
+        flash('Observation successfully created!')
 
         # return observation
         return jsonify({
