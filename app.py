@@ -155,29 +155,12 @@ def create_app(test_config=None):
         Handles GET requests for getting all plants.
         '''
 
-        # get all plants from database
-        plants = Plant.query.all()
+        # get all plants from API
+        response = get_plants_api()
+        data = json.loads(response.data)
+        plants = data['plants']
 
-        # for plant in plants:
-        #     print(
-        #         'PLANT: \n'
-        #         '{'
-        #         f'"contributorEmail": "{plant.contributor_email}",'
-        #         f'"name": "{plant.name}",'
-        #         f'"latinName": "{plant.latin_name}",'
-        #         f'"description": "{plant.description}",'
-        #         f'"imageLink": "{plant.image_link}"'
-        #         '}'
-        #     )
-
-        # 404 if no plants found
-        if len(plants) == 0:
-            abort(404)
-
-        # format each plant
-        plants = format_plants(plants)
-
-        # return plants
+        # return template with plants
         return render_template('pages/plants.html',
                                plants=plants), 200
 
