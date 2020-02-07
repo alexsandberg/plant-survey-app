@@ -284,44 +284,6 @@ def create_app(test_config=None):
         return render_template('forms/new_observation.html',
                                plant=plant.format()), 200
 
-    @app.route('/observations/new', methods=['POST'])
-    # @requires_auth('post:observations')
-    @login_required
-    def post_plant_observation():
-        '''
-        Handles POST requests for adding new observation.
-        '''
-
-        # load data from request and session
-        contributor_email = session['jwt_payload']['email']
-        plant_id = request.args.get('plant')
-        name = request.form['name']
-        date = request.form['date']
-        notes = request.form['notes']
-
-        # ensure required fields have data
-        if ((contributor_email is None) or (name == '') or (date == '')
-                or (plant_id == '')):
-            abort(422)
-
-        # create a new plant
-        observation = Observation(contributor_email=contributor_email,
-                                  name=name, date=date, plant_id=plant_id,
-                                  notes=notes)
-
-        try:
-            # add observation to the database
-            observation.insert()
-        except Exception as e:
-            print('ERROR: ', str(e))
-            abort(422)
-
-        # flash success message
-        flash('Observation successfully created!')
-
-        # return redirect to dashboard
-        return redirect('/dashboard')
-
     @app.route('/observations/<int:id>/edit')
     # @requires_auth('edit_or_delete:observations')
     @login_required
@@ -633,6 +595,50 @@ def create_app(test_config=None):
             abort(404)
 
         # return formatted observation
+        return jsonify({
+            'success': True,
+            'observation': observation.format()
+        })
+
+    @app.route('/api/observations/new', methods=['POST'])
+    def post_plant_observation_api():
+        '''
+        Handles API POST requests for adding new observation.
+        '''
+
+        # get request body
+        body = request.get_json()
+
+        # get email from session or body
+        if 'jwt_payload' in session and 'email' in session['jwt_payload']:
+            contributor_email = session['jwt_payload']['email']
+        else:
+            contributor_email = body.get('contributorEmail')
+
+        # load observation body data
+        plant_id = body.get('plantID')
+        name = body.get('name')
+        date = body.get('date')
+        notes = body.get('notes')
+
+        # ensure required fields have data
+        if ((contributor_email is None) or (name == '') or (date == '')
+                or (plant_id == '')):
+            abort(422)
+
+        # create a new observation
+        observation = Observation(contributor_email=contributor_email,
+                                  name=name, date=date, plant_id=plant_id,
+                                  notes=notes)
+
+        try:
+            # add observation to the database
+            observation.insert()
+        except Exception as e:
+            print('ERROR: ', str(e))
+            abort(422)
+
+        # return observation
         return jsonify({
             'success': True,
             'observation': observation.format()
