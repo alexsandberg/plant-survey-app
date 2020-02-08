@@ -47,20 +47,6 @@ def create_app(test_config=None):
         },
     )
 
-    # get Auth0 Management API token
-    data = {
-        'grant_type': 'client_credentials',
-        'client_id': AUTH0_CLIENT_ID,
-        'client_secret': AUTH0_CLIENT_SECRET,
-        'audience': 'https://plant-survey.auth0.com/api/v2/'
-    }
-
-    resp = requests.post('https://plant-survey.auth0.com/oauth/token', data=data, headers = {'content-type': 'application/x-www-form-urlencoded'})
-    info = resp.json()
-    mgmt_token = info['access_token']
-    # print('MGMT TOKEN: ', mgmt_token)
-
-
     # set up CORS, allowing all origins
     CORS(app, resources={'/': {'origins': '*'}})
 
@@ -105,6 +91,19 @@ def create_app(test_config=None):
         user_id = userinfo['sub']
         # print('ID: ', user_id)
 
+        # get Auth0 Management API token
+        data = {
+            'grant_type': 'client_credentials',
+            'client_id': AUTH0_CLIENT_ID,
+            'client_secret': AUTH0_CLIENT_SECRET,
+            'audience': 'https://plant-survey.auth0.com/api/v2/'
+        }
+
+        resp = requests.post('https://plant-survey.auth0.com/oauth/token', data=data, headers = {'content-type': 'application/x-www-form-urlencoded'})
+        info = resp.json()
+        mgmt_token = info['access_token']
+        # print('MGMT TOKEN: ', mgmt_token)
+
         # get user info from management api
         user_resp = requests.get(f'https://plant-survey.auth0.com/api/v2/users/{user_id}', headers={'Authorization': f"Bearer {mgmt_token}"})
         id_info = user_resp.json()
@@ -117,7 +116,7 @@ def create_app(test_config=None):
         else:
             username = id_info['email']
 
-        # print('USERNAME: ', username)
+        print('USERNAME: ', username)
 
 
         session['logged_in'] = True
