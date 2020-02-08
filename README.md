@@ -20,55 +20,11 @@ This tool is the capstone project for the [Udacity Full Stack Web Developer Nano
     * API is [hosted live via Heroku](https://plant-survey-tool.herokuapp.com/)
 
 
-## Getting Started
-
-### Installing Dependencies
-Developers using this project should already have Python3 and pip installed.
-
-#### Backend Dependencies
-
-Once you have cloned this project and your virtual environment setup and running, install dependencies by naviging to the root directory and running:
-
-```
-pip install -r requirements.txt
-```
-
-## Running the Server Locally
-
-From within the root directory first ensure you are working using your created virtual environment.
-
-To set up the database, execute:
-```
-dropdb plant_survey
-createdb plant_survey
-psql plant_survey < plant_survey.psql
-```
-
-To run the development server, execute:
-
-```
-export DATABASE_URL=<local_database_path>
-export FLASK_ENV=development
-python3 app.py
-```
-
-## Testing
-To run the tests, run
-```
-export ADMIN_ROLE_TOKEN=<active_admin_jwt>
-export PUBLIC_ROLE_TOKEN=<active_public_jwt>
-dropdb plant_survey_test
-createdb plant_survey_test
-psql plant_survey_test < plant_survey.psql
-python3 test_app.py
-```
-Omit the dropdb command the first time you run tests.
-
 ## API Reference
 
 ### Getting Started
 
-* Base URL: Plant and observations data can be accessed directly through the API, using the base URL `https://plant-survey-tool.herokuapp.com/api`. Alternatively, follow directions above to run the application locally.
+* Base URL: Plant and observations data can be accessed directly through the API, using the base URL `https://plant-survey-tool.herokuapp.com/api`. Alternatively, utilize the frontend at [https://plant-survey-tool.herokuapp.com/](https://plant-survey-tool.herokuapp.com/).
 * Authentication: Most endpoints require either Public or Admin permissions. This version does not require authentication or API keys.
 
 ### Error Handling

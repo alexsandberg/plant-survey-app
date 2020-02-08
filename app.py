@@ -10,6 +10,7 @@ from auth.auth import AuthError, requires_auth, requires_auth_permissions, creat
 import constants
 import json
 from dotenv import load_dotenv, find_dotenv
+import requests
 
 
 def create_app(test_config=None):
@@ -42,9 +43,23 @@ def create_app(test_config=None):
         access_token_url=AUTH0_BASE_URL + '/oauth/token',
         authorize_url=AUTH0_BASE_URL + '/authorize',
         client_kwargs={
-            'scope': 'openid profile email',
+            'scope': 'openid profile email preferred_username',
         },
     )
+
+    # get Auth0 Management API token
+    data = {
+        'grant_type': 'client_credentials',
+        'client_id': AUTH0_CLIENT_ID,
+        'client_secret': AUTH0_CLIENT_SECRET,
+        'audience': 'https://plant-survey.auth0.com/api/v2/'
+    }
+
+    resp = requests.post('https://plant-survey.auth0.com/oauth/token', data=data, headers = {'content-type': 'application/x-www-form-urlencoded'})
+    info = resp.json()
+    mgmt_token = info['access_token']
+    # print('MGMT TOKEN: ', mgmt_token)
+
 
     # set up CORS, allowing all origins
     CORS(app, resources={'/': {'origins': '*'}})
@@ -87,16 +102,35 @@ def create_app(test_config=None):
         resp = auth0.get('userinfo')
         userinfo = resp.json()
 
+        user_id = userinfo['sub']
+        # print('ID: ', user_id)
+
+        # get user info from management api
+        user_resp = requests.get(f'https://plant-survey.auth0.com/api/v2/users/{user_id}', headers={'Authorization': f"Bearer {mgmt_token}"})
+        id_info = user_resp.json()
+
+        # get username from response
+        if 'username' in id_info:
+            username = id_info['username']
+        elif 'name' in id_info:
+            username = id_info['name']
+        else:
+            username = id_info['email']
+
+        # print('USERNAME: ', username)
+
+
         session['logged_in'] = True
         session[constants.JWT_PAYLOAD] = userinfo
         session[constants.JWT] = token['access_token']
         session[constants.PROFILE_KEY] = {
             'user_id': userinfo['sub'],
+            'username': username,
             'name': userinfo['name'],
             'picture': userinfo['picture']
         }
-        # print('USER ID: ', session['profile']['user_id'])
         
+
         return redirect('/dashboard')
 
     @app.route('/login')
@@ -123,13 +157,13 @@ def create_app(test_config=None):
         if 'jwt_payload' not in session:
             return render_template('pages/login.html'), 200
 
-        contributor_email = session['jwt_payload']['email']
+        user_id = session['profile']['user_id']
 
         # get all plants and observations that match user email
         plants = Plant.query.filter_by(
-            contributor_email=contributor_email).all()
+            user_id=user_id).all()
         observations = Observation.query.filter_by(
-            contributor_email=contributor_email).all()
+            user_id=user_id).all()
 
         # format all plants and observations
         if (len(plants) != 0):

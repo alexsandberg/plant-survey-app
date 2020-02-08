@@ -46,7 +46,8 @@ class Plant(db.Model):
     __tablename__ = 'Plant'
 
     id = Column(Integer, primary_key=True)
-    contributor_email = Column(String(120), nullable=False)
+    username = Column(String(120), nullable=False)
+    user_id = Column(String(120), nullable=False)
     name = Column(String(120), nullable=False)
     latin_name = Column(String(120), nullable=False)
     description = Column(String(2500), nullable=False)
@@ -54,8 +55,9 @@ class Plant(db.Model):
     plant_observations = db.relationship(
         'Observation', backref='plant', lazy=True)
 
-    def __init__(self, contributor_email, name, latin_name, description, image_link):
-        self.contributor_email = contributor_email
+    def __init__(self, username, user_id, name, latin_name, description, image_link):
+        self.username = username
+        self.user_id = user_id
         self.name = name
         self.latin_name = latin_name
         self.description = description
@@ -78,7 +80,8 @@ class Plant(db.Model):
     def format(self):
         return {
             'id': self.id,
-            'contributor_email': self.contributor_email,
+            'username': self.username,
+            'user_id': self.user_id,
             'name': self.name,
             'latin_name': self.latin_name,
             'description': self.description,
@@ -97,8 +100,8 @@ class Observation(db.Model):
     __tablename__ = 'Observations'
 
     id = Column(Integer, primary_key=True)
-    contributor_email = Column(String(120), nullable=False)
-    name = Column(String(120), nullable=False)
+    username = Column(String(120), nullable=False)
+    user_id = Column(String(120), nullable=False)
     date = Column(db.DateTime, nullable=False,
                   default=datetime.utcnow)
     plant_id = Column(Integer, db.ForeignKey(
@@ -106,15 +109,15 @@ class Observation(db.Model):
     notes = Column(String(2500))
     # add GPS location?
 
-    def __init__(self, contributor_email, name, date, plant_id, notes):
-        self.contributor_email = contributor_email
-        self.name = name
+    def __init__(self, username, user_id, date, plant_id, notes):
+        self.username = username
+        self.user_id = user_id
         self.date = date
         self.plant_id = plant_id
         self.notes = notes
 
     def __repr__(self):
-        return f'<Observation: Name {self.plant_id}, Date {self.date}, Plant ID {self.plant_id}>'
+        return f'<Observation: Username {self.username}, Date {self.date}, Plant ID {self.plant_id}>'
 
     def insert(self):
         db.session.add(self)
@@ -130,8 +133,8 @@ class Observation(db.Model):
     def format(self):
         return {
             'id': self.id,
-            'contributor_email': self.contributor_email,
-            'name': self.name,
+            'username': self.username,
+            'user_id': self.user_id,
             'datetime': self.date,
             'date': format_datetime(self.date),
             'plant_name': Plant.query.filter_by(id=self.plant_id).one_or_none().name,
