@@ -17,14 +17,8 @@ This tool is the capstone project for the [Udacity Full Stack Web Developer Nano
     * Configure Role Based Authentication and roles-based access control (RBAC) in a Flask application utilizing Auth0
     * Decode and verify JWTs from Authorization headers
 * Deployment
-    * API is hosted live via Heroku
+    * API is [hosted live via Heroku](https://plant-survey-tool.herokuapp.com/)
 
-#### Upcoming features
-
-* An interactive frontend with geospatial visualization of plant observations
-* New users will automatically be assigned "Public" role
-* Users can only modify entries they've created
-* Observations will include GPS data 
 
 ## Getting Started
 

@@ -1,0 +1,217 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.1
+-- Dumped by pg_dump version 12.1
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: Observations; Type: TABLE; Schema: public; Owner: alex
+--
+
+CREATE TABLE public."Observations" (
+    id integer NOT NULL,
+    name character varying(120) NOT NULL,
+    date timestamp without time zone NOT NULL,
+    plant_id integer NOT NULL,
+    notes character varying(2500),
+    contributor_email character varying(120) NOT NULL
+);
+
+
+ALTER TABLE public."Observations" OWNER TO alex;
+
+--
+-- Name: Observations_id_seq; Type: SEQUENCE; Schema: public; Owner: alex
+--
+
+CREATE SEQUENCE public."Observations_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."Observations_id_seq" OWNER TO alex;
+
+--
+-- Name: Observations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alex
+--
+
+ALTER SEQUENCE public."Observations_id_seq" OWNED BY public."Observations".id;
+
+
+--
+-- Name: Plant; Type: TABLE; Schema: public; Owner: alex
+--
+
+CREATE TABLE public."Plant" (
+    id integer NOT NULL,
+    name character varying(120) NOT NULL,
+    latin_name character varying(120) NOT NULL,
+    description character varying(2500) NOT NULL,
+    image_link character varying(500) NOT NULL,
+    contributor_email character varying(120) NOT NULL
+);
+
+
+ALTER TABLE public."Plant" OWNER TO alex;
+
+--
+-- Name: Plant_id_seq; Type: SEQUENCE; Schema: public; Owner: alex
+--
+
+CREATE SEQUENCE public."Plant_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."Plant_id_seq" OWNER TO alex;
+
+--
+-- Name: Plant_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alex
+--
+
+ALTER SEQUENCE public."Plant_id_seq" OWNED BY public."Plant".id;
+
+
+--
+-- Name: alembic_version; Type: TABLE; Schema: public; Owner: alex
+--
+
+CREATE TABLE public.alembic_version (
+    version_num character varying(32) NOT NULL
+);
+
+
+ALTER TABLE public.alembic_version OWNER TO alex;
+
+--
+-- Name: Observations id; Type: DEFAULT; Schema: public; Owner: alex
+--
+
+ALTER TABLE ONLY public."Observations" ALTER COLUMN id SET DEFAULT nextval('public."Observations_id_seq"'::regclass);
+
+
+--
+-- Name: Plant id; Type: DEFAULT; Schema: public; Owner: alex
+--
+
+ALTER TABLE ONLY public."Plant" ALTER COLUMN id SET DEFAULT nextval('public."Plant_id_seq"'::regclass);
+
+
+--
+-- Data for Name: Observations; Type: TABLE DATA; Schema: public; Owner: alex
+--
+
+COPY public."Observations" (id, name, date, plant_id, notes, contributor_email) FROM stdin;
+16	Alex Sandberg	2020-02-06 15:49:00	29	Seen hiking in San Juan Mountains	alexsandberg7@gmail.com
+17	Alex Sandberg	2020-01-21 15:50:00	31	Seen in Rocky Mountain National Park	alexsandberg7@gmail.com
+18	Alex Sandberg	2019-11-19 15:52:00	33	Seen in Rifle	alexsandberg7@gmail.com
+19	Alex	2019-04-17 15:53:00	35	Seen in Boulder	alexsandberg7@gmail.com
+20	Alex JHU	2020-02-06 16:15:00	29	Cool flower	asandbe3@jh.edu
+23	a	2020-02-06 16:38:00	31	a	asandbe3@jh.edu
+24	A	2020-02-07 11:02:00	34	TEST	alexsandberg7@gmail.com
+\.
+
+
+--
+-- Data for Name: Plant; Type: TABLE DATA; Schema: public; Owner: alex
+--
+
+COPY public."Plant" (id, name, latin_name, description, image_link, contributor_email) FROM stdin;
+29	Harrington’s beardtongue	Penstemon harringtonii	Plants perennial, 30-70 cm tall. Stems glabrous and glaucus. Flowers in loose spike with 2 exserted stamens. Corolla deep blue to pinkish lavender.	http://www.cnhp.colostate.edu/rareplants/images/1/closeup3_19662.jpg	alexsandberg7@gmail.com
+31	Pagosa bladderpod	Physaria pruinosa	Physaria pruinosa begins to flower by mid May with fruiting time depending on elevation. Plants at lower elevations are in late stages of fruiting by the beginning of June, whereas plants at higher elevations are only in early stages of fruiting at that time. Plants have been observed with a few flowers as late as the last week of August.	https://cnhp.colostate.edu/rareplants/images/1/closeup1_18927.jpg	alexsandberg7@gmail.com
+33	Parachute penstemon	Penstemon debilis	Penstemon debilis is a member of the figwort family (Schrophulariaceae). It is an herbaceous perennial which often forms mats or trails where the stems may root at the node. The flowers are white to lavender. There are no basal leaves and the cauline leaves are sessile, opposite, succulent and blue-glaucous.	https://cnhp.colostate.edu/rareplants/images/1/closeup1_20696.jpg	alexsandberg7@gmail.com
+35	Slender Spiderflower	Peritoma multicaulis	Cleome multicaulis is a slender annual forb with erect, unbranched or sparingly branched leafy stems 2-7 dm tall, and glabrous. Leaves are short-petioled and palmately compound with 3 narrow leaflets 1-2 cm long and less than 1.5 mm wide, and may be folded along the midrib. Flowers have 4 pink or pinkish-white petals 4-6 mm long and are borne on thin stalks in the axils of reduced leaves. The 6 stamens are equal in length to the petals. Fruits are narrow capsules 6-18 mm long, tapering to a stalk-like base (gynophore), and droop at maturity.	https://cnhp.colostate.edu/rareplants/images/1/closeup1_18080.jpg	alexsandberg7@gmail.com
+37	Colorado Larkspur	Delphinium ramosum var. alpestre	Perennial herb 5-25 cm tall; leaves all on stem, but crowded near base, petioles 1-10 cm long, blades 2-5 cm long and about as wide, palmately divided into 5 main lobes, each lobe further dissected into smaller lobes; inflorescence a raceme of 2-8 flowers; sepals dull blue or dull blue tinged with brown, especially on the back, spreading or forward-pointing, 11-14 mm long, the upper sepal extended basally into a spur 8-12 mm long; lower petal blades cleft, 4-6 mm long.	https://cnhp.colostate.edu/rareplants/images/1/closeup1_16702.jpg	alexsandberg7@gmail.com
+39	Eastwood Monkey-Flower	Mimulus eastwoodiae	Stoloniferous perennial, stems 5-30 cm long. New fertile plants are produced wherever roots take hold.	https://cnhp.colostate.edu/rareplants/images/1/closeup1_21230.jpg	alexsandberg7@gmail.com
+30	Good-neighbor bladderpod	Physaria vicina	Flower petals 6-10 mm/0.2-0.4 in long, white with a yellow base; flower stalks may be sigmoid (S-shaped) or curved, sometimes straight. Siliques (fruit) are erect, and stellate-pubescent; stems 1-2.5 dm/4-10 in long, ascending (in flower) or nearly prostrate (in fruit); perennial.	https://cnhp.colostate.edu/rareplants/images/1/closeup1_20366.jpg	alexsandberg7@gmail.com
+32	Adobe Hills thistle	Cirsium perplexans	Taprooted perennial or biennial, 2-10 dm tall, with purplish, striate stems. Flowers rose or reddish-purple; flower heads about 3 cm high and broad. Phyllaries spreading to reflexed, with erose tips or spines 1-2 mm long; bracts with distinct glandular back. Lower leaves oblanceolate, upper leaves lanceolate and clasping, not decurrent; leaves toothed with weak yellow spines.	https://cnhp.colostate.edu/rareplants/images/1/closeup1_22079.jpg	alexsandberg7@gmail.com
+34	Colorado hookless cactus	Sclerocactus glaucus	A squat, globular, spiny succulent. Each mature stem is 3-12 cm tall, 4-9 cm wide; the largest observed was 24 cm tall x 14 cm wide. However, during the driest part of the year the stem may shrink to below ground-level. Central spines are straight (hookless). The plants are inconspicuous except when in flower (April-May), when showy, fragrant, pink to magenta flowers appear at the top of the stem.	https://cnhp.colostate.edu/rareplants/images/1/closeup1_16984.jpg	alexsandberg7@gmail.com
+36	Gypsum Valley cat-eye	Oreocarya revealii	Plants are low, densely tufted herbaceous perennials, 0.3-2.5 dm high, 0.5-4 dm across, with a highly branched, woody caudex system arising from a deeply-seated taproot. Leaves are glabrous on top and have appressed pustulate-based bristles on lower surface. Basal leaves are tufted, narrowly oblanceolate to narrowly spatulate, 1-2.5 (3) cm long, 1.5-3 mm wide. Cauline leaves are scattered, oblanceolate to spatulate, 1-4 cm long, 2-4 (5) mm wide. Stems are erect and softly hairy. The calyx is turbinate, with segments narrowly lanceolate, 4-6 mm long in anthesis, (4) 6-9 mm long in fruit. The corolla is white with yellow fornices, about 10-12 mm long, prominently exserted from the calyx. Usually all 4 nutlets mature, and are rugose-tuberculate on both surfaces. Styles surpass the nutlets by 4-7 mm.	https://cnhp.colostate.edu/rareplants/images/1/closeup1_40346.jpg	alexsandberg7@gmail.com
+38	Jones Blue Star	Amsonia jonesii	Flowers tubular, powder-blue; corolla with 5 lobes united at the base, and with stiff inpointing hairs; leaves alternate; stems 1.5-5 dm tall, usually much branched from the base; plants with milky juice; tap rooted perennial.	https://cnhp.colostate.edu/rareplants/images/1/closeup2_18648.jpg	alexsandberg7@gmail.com
+\.
+
+
+--
+-- Data for Name: alembic_version; Type: TABLE DATA; Schema: public; Owner: alex
+--
+
+COPY public.alembic_version (version_num) FROM stdin;
+19fcc623bd9e
+5366394e4835
+\.
+
+
+--
+-- Name: Observations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: alex
+--
+
+SELECT pg_catalog.setval('public."Observations_id_seq"', 27, true);
+
+
+--
+-- Name: Plant_id_seq; Type: SEQUENCE SET; Schema: public; Owner: alex
+--
+
+SELECT pg_catalog.setval('public."Plant_id_seq"', 44, true);
+
+
+--
+-- Name: Observations Observations_pkey; Type: CONSTRAINT; Schema: public; Owner: alex
+--
+
+ALTER TABLE ONLY public."Observations"
+    ADD CONSTRAINT "Observations_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: Plant Plant_pkey; Type: CONSTRAINT; Schema: public; Owner: alex
+--
+
+ALTER TABLE ONLY public."Plant"
+    ADD CONSTRAINT "Plant_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: alembic_version alembic_version_pkc; Type: CONSTRAINT; Schema: public; Owner: alex
+--
+
+ALTER TABLE ONLY public.alembic_version
+    ADD CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num);
+
+
+--
+-- Name: Observations Observations_plant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alex
+--
+
+ALTER TABLE ONLY public."Observations"
+    ADD CONSTRAINT "Observations_plant_id_fkey" FOREIGN KEY (plant_id) REFERENCES public."Plant"(id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+

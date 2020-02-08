@@ -95,6 +95,8 @@ def create_app(test_config=None):
             'name': userinfo['name'],
             'picture': userinfo['picture']
         }
+        # print('USER ID: ', session['profile']['user_id'])
+        
         return redirect('/dashboard')
 
     @app.route('/login')
