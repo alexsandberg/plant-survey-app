@@ -115,16 +115,29 @@ def create_app(test_config=None):
             username = id_info['name']
         else:
             username = id_info['email']
+        # print('USERNAME: ', username)
 
-        print('USERNAME: ', username)
+        # get permissions from management api
+        permissions_resp = requests.get(f'https://plant-survey.auth0.com/api/v2/users/{user_id}/permissions', headers={'Authorization': f"Bearer {mgmt_token}"})
+        permissions_info = permissions_resp.json()
+        permissions = [permission['permission_name'] for permission in permissions_info]
+        # print('PERMISSIONS: ', permissions)
 
+        # get user's roles from management api
+        roles_resp = requests.get(f'https://plant-survey.auth0.com/api/v2/users/{user_id}/roles', headers={'Authorization': f"Bearer {mgmt_token}"})
+        roles_info = roles_resp.json()
+        roles = [role['name'] for role in roles_info ]
+        # print('ROLES: ', roles)
 
+        # add session variables
         session['logged_in'] = True
         session[constants.JWT_PAYLOAD] = userinfo
         session[constants.JWT] = token['access_token']
         session[constants.PROFILE_KEY] = {
             'user_id': userinfo['sub'],
             'username': username,
+            'permissions': permissions,
+            'roles': roles,
             'name': userinfo['name'],
             'picture': userinfo['picture']
         }
@@ -139,7 +152,6 @@ def create_app(test_config=None):
 
     @app.route('/logout')
     def logout():
-        # session.pop('logged_in', None)
         session.clear()
         params = {'returnTo': url_for(
             'home', _external=True), 'client_id': AUTH0_CLIENT_ID}

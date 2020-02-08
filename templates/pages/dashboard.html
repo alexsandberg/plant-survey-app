@@ -3,7 +3,7 @@
 {% block content %}
 <div class="posts-container">
 
-    {% if session['jwt_payload']['email'] == 'alexsandberg7@gmail.com' %}
+    {% if 'Admin' in session['profile']['roles'] %}
     <a href="/plants/new">
         <button class="btn btn-primary">New Plant</button>
     </a>
