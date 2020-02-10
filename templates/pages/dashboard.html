@@ -3,7 +3,7 @@
 {% block content %}
 <div class="posts-container">
 
-    {% if 'Admin' in session['profile']['roles'] %}
+    {% if session['profile']['role'] == 'Admin' %}
     <a href="/plants/new">
         <button class="btn btn-primary">New Plant</button>
     </a>
