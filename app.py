@@ -76,12 +76,11 @@ def create_app(test_config=None):
     # plant formatting
     def format_plants(plants):
         return [plant.format() for plant in plants]
-    
 
     # observation formatting
+
     def format_observations(observations):
         return [observation.format() for observation in observations]
-    
 
     # get Auth0 management API token
     def get_mgmt_token():
@@ -93,14 +92,13 @@ def create_app(test_config=None):
             'audience': 'https://plant-survey.auth0.com/api/v2/'
         }
 
-        resp = requests.post('https://plant-survey.auth0.com/oauth/token', 
-                            data=data, 
-                            headers = {'content-type': 'application/x-www-form-urlencoded'})
+        resp = requests.post('https://plant-survey.auth0.com/oauth/token',
+                             data=data,
+                             headers={'content-type': 'application/x-www-form-urlencoded'})
         info = resp.json()
         mgmt_token = info['access_token']
 
         return mgmt_token
-
 
     # check if user is in database
     def check_if_user_exists(user_id):
@@ -115,32 +113,41 @@ def create_app(test_config=None):
         else:
             print('USER FOUND')
             return True
-    
+
     # add 'Public' role to user
     def add_public_role(user_id, mgmt_token):
 
+        # Auth0 public role ID
+        PUBLIC_ROLE_ID = 'rol_X9T29OUlO7kYdItp'
+
         # request body
-        data = {"roles": ["Public"]}
+        data = {
+            "roles": [
+                PUBLIC_ROLE_ID
+            ]
+        }
 
+        # this works!!!! catch exceptions
         # call management API with user_id and role
-        role_resp = requests.post(f'https://plant-survey.auth0.com/api/v2/users/{user_id}/roles', 
-                                    headers={'Authorization': f"Bearer {mgmt_token}"},
-                                    data=data)
-        role_info = role_resp.json()
+        role_resp = requests.post(f'https://plant-survey.auth0.com/api/v2/users/{user_id}/roles',
+                                  headers={
+                                      'Authorization': f"Bearer {mgmt_token}"},
+                                  json=data)
+        # role_info = role_resp.json()
 
-        print('ROLE INFO: ', role_info)
-
+        # print('ROLE INFO: ', role_info)
 
     # add user if not in database
+
     def create_new_user(user):
         print('NEW USER: ', user)
-        
+
         # create new user
-        new_user = User(name = user['name'], 
-                        username = user['username'],
-                        user_id = user['user_id'],
-                        date_added = user['date_added'],
-                        role = user['role'])
+        new_user = User(name=user['name'],
+                        username=user['username'],
+                        user_id=user['user_id'],
+                        date_added=user['date_added'],
+                        role=user['role'])
 
         try:
             # insert new user in Users table
@@ -148,9 +155,8 @@ def create_app(test_config=None):
         except Exception as e:
             print('ERROR: ', str(e))
             abort(422)
-        
-        return True
 
+        return True
 
     # AUTH ROUTES -- AUTH0 BOILERPLATE
 
@@ -172,11 +178,13 @@ def create_app(test_config=None):
 
         # check if user exists in Users table
         if check_if_user_exists(user_id):
-            
+
             # get user info from Users table
             name = User.query.filter_by(user_id=user_id).one_or_none().name
-            username = User.query.filter_by(user_id=user_id).one_or_none().username
-            date_added = User.query.filter_by(user_id=user_id).one_or_none().date_added
+            username = User.query.filter_by(
+                user_id=user_id).one_or_none().username
+            date_added = User.query.filter_by(
+                user_id=user_id).one_or_none().date_added
             role = User.query.filter_by(user_id=user_id).one_or_none().role
 
             # add to user info
@@ -196,8 +204,8 @@ def create_app(test_config=None):
             user['role'] = 'Public'
 
             # get additional user info from management api
-            user_resp = requests.get(f'https://plant-survey.auth0.com/api/v2/users/{user_id}', 
-                                    headers={'Authorization': f"Bearer {mgmt_token}"})
+            user_resp = requests.get(f'https://plant-survey.auth0.com/api/v2/users/{user_id}',
+                                     headers={'Authorization': f"Bearer {mgmt_token}"})
             id_info = user_resp.json()
 
             # get username from response
@@ -207,14 +215,14 @@ def create_app(test_config=None):
                 username = id_info['name']
             else:
                 username = id_info['email']
-            
+
             user['username'] = username
             user['name'] = id_info['name']
 
             # set date added to now
             user['date_added'] = datetime.utcnow()
 
-            # add new user to Users table 
+            # add new user to Users table
             create_new_user(user)
 
         # get permissions from management api
@@ -231,7 +239,6 @@ def create_app(test_config=None):
 
         print('USER INFO FINAL: ', user)
 
-
         # add session variables
         session['logged_in'] = True
         session[constants.JWT_PAYLOAD] = userinfo
@@ -245,7 +252,6 @@ def create_app(test_config=None):
         #     'name': user['name'],
         #     'picture': userinfo['picture']
         # }
-        
 
         return redirect('/dashboard')
 
@@ -273,7 +279,8 @@ def create_app(test_config=None):
             return render_template('pages/login.html'), 200
 
         # get user from Users table
-        user_table_id = User.query.filter_by(user_id=session['profile']['user_id']).one_or_none().id
+        user_table_id = User.query.filter_by(
+            user_id=session['profile']['user_id']).one_or_none().id
 
         # get all plants and observations that match user
         plants = Plant.query.filter_by(
