@@ -87,3 +87,7 @@ h1, h2 {
     margin-left: 10px;
     margin-right: 10px;
 }
+
+.api-key-card {
+    max-width: 600px;
+}

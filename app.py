@@ -738,6 +738,14 @@ def create_app(test_config=None):
                 "observation_id": observation_id
             })
 
+    @app.route('/api/key')
+    def get_api_key():
+        '''
+        Endpoint for getting API key for curl requests and testing
+        '''
+
+        return render_template('/pages/api_key.html')
+
     # Error Handling
     '''
     Error handling for unprocessable entity
