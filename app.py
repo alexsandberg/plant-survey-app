@@ -663,10 +663,13 @@ def create_app(test_config=None):
 
     @app.route('/api/observations/<int:id>/edit', methods=['PATCH', 'DELETE'])
     @requires_auth('edit_or_delete:observations')
-    def edit_or_delete_observation_api(id):
+    def edit_or_delete_observation_api(*args, **kwargs):
         '''
         Handles PATCH and DELETE requests for observations.
         '''
+
+        # get id from kwargs
+        id = kwargs['id']
 
         # get observation by id
         observation = Observation.query.filter_by(id=id).one_or_none()
@@ -687,13 +690,10 @@ def create_app(test_config=None):
                 body_keys.append(key)
 
             # make sure correct keys are present
-            if sorted(body_keys) != sorted(['name', 'date', 'notes']):
+            if sorted(body_keys) != sorted(['date', 'notes']):
                 abort(422)
 
             # update observation with data from body
-            if body.get('name'):
-                observation.name = body.get('name')
-
             if body.get('date'):
                 observation.date = body.get('date')
 
@@ -719,8 +719,7 @@ def create_app(test_config=None):
         # if DELETE
         if request.method == 'DELETE':
 
-            # save observation name and id
-            observation_name = observation.name
+            # save observation id
             observation_id = observation.id
 
             try:
@@ -736,7 +735,6 @@ def create_app(test_config=None):
             # return success
             return jsonify({
                 "success": True,
-                "observation_name": observation_name,
                 "observation_id": observation_id
             })
 
