@@ -5,7 +5,7 @@ from flask_cors import CORS
 from os import environ as env
 from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
-from auth.auth import AuthError, requires_auth, requires_auth_permissions, create_login_link
+from auth.auth import AuthError, requires_auth, create_login_link
 import constants
 import json
 from dotenv import load_dotenv, find_dotenv
@@ -319,7 +319,8 @@ def create_app(test_config=None):
 
     @app.route('/plants/new')
     @login_required
-    def new_plant_form():
+    @requires_auth('post:plants')
+    def new_plant_form(jwt):
         '''
         Handles GET requests for new plant form page.
         '''
@@ -327,8 +328,8 @@ def create_app(test_config=None):
         return render_template('forms/new_plant.html'), 200
 
     @app.route('/plants/<int:id>/edit')
-    @requires_auth_permissions('edit_or_delete:plants')
     @login_required
+    @requires_auth('edit_or_delete:plants')
     def get_edit_plant_form(*args, **kwargs):
         '''
         Handles GET requests for edit plant form.
@@ -361,7 +362,8 @@ def create_app(test_config=None):
 
     @app.route('/observations/new')
     @login_required
-    def new_observation_form():
+    @requires_auth('post:observations')
+    def new_observation_form(jwt):
         '''
         Handles GET requests for new plant form page.
         '''
@@ -386,6 +388,7 @@ def create_app(test_config=None):
 
     @app.route('/observations/<int:id>/edit')
     @login_required
+    @requires_auth('edit_or_delete:observations')
     def get_edit_observation_form(*args, **kwargs):
         '''
         Handles GET requests for edit observation form.
@@ -445,7 +448,7 @@ def create_app(test_config=None):
         })
 
     @app.route('/api/plants/new', methods=['POST'])
-    @requires_auth_permissions('post:plants')
+    @requires_auth('post:plants')
     def new_plant_api(jwt):
 
         # get request body
@@ -486,7 +489,7 @@ def create_app(test_config=None):
         })
 
     @app.route('/api/plants/<int:id>/edit', methods=['PATCH', 'DELETE'])
-    @requires_auth_permissions('edit_or_delete:plants')
+    @requires_auth('edit_or_delete:plants')
     def edit_or_delete_plant_api(*args, **kwargs):
         '''
         Handles API PATCH and DELETE requests for plants.
@@ -519,7 +522,6 @@ def create_app(test_config=None):
                 abort(422)
 
             # update plant with data from body
-            # contributor_email is not allowed to be updated
             if body.get('name'):
                 plant.name = body.get('name')
 
@@ -618,7 +620,8 @@ def create_app(test_config=None):
         })
 
     @app.route('/api/observations/new', methods=['POST'])
-    def post_plant_observation_api():
+    @requires_auth('post:observations')
+    def post_plant_observation_api(jwt):
         '''
         Handles API POST requests for adding new observation.
         '''
@@ -626,11 +629,8 @@ def create_app(test_config=None):
         # get request body
         body = request.get_json()
 
-        # get email from session or body
-        if 'jwt_payload' in session and 'email' in session['jwt_payload']:
-            contributor_email = session['jwt_payload']['email']
-        else:
-            contributor_email = body.get('contributorEmail')
+        # get user table id from session
+        user_id = session['profile']['user_table_id']
 
         # load observation body data
         plant_id = body.get('plantID')
@@ -639,12 +639,12 @@ def create_app(test_config=None):
         notes = body.get('notes')
 
         # ensure required fields have data
-        if ((contributor_email is None) or (name == '') or (date == '')
+        if ((name == '') or (date == '')
                 or (plant_id == '')):
             abort(422)
 
         # create a new observation
-        observation = Observation(contributor_email=contributor_email,
+        observation = Observation(user_id=user_id,
                                   name=name, date=date, plant_id=plant_id,
                                   notes=notes)
 
@@ -665,6 +665,7 @@ def create_app(test_config=None):
         })
 
     @app.route('/api/observations/<int:id>/edit', methods=['PATCH', 'DELETE'])
+    @requires_auth('edit_or_delete:observations')
     def edit_or_delete_observation_api(id):
         '''
         Handles PATCH and DELETE requests for observations.
@@ -693,7 +694,6 @@ def create_app(test_config=None):
                 abort(422)
 
             # update observation with data from body
-            # contributor_email is not allowed to be updated
             if body.get('name'):
                 observation.name = body.get('name')
 
