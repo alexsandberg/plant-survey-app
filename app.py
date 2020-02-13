@@ -250,17 +250,20 @@ def create_app(test_config=None):
             'home', _external=True), 'client_id': AUTH0_CLIENT_ID}
         return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
 
+    @app.route('/favicon.ico')
+    def favicon():
+        return redirect('https://img.icons8.com/color/48/000000/flower.png')
+
     # ------------------------------------
     # ROUTES
     # ------------------------------------
 
     @app.route('/dashboard')
-    @login_required
     def dashboard():
 
-        # # if no active jwt, redirect to home login page
-        # if 'jwt_payload' not in session:
-        #     return render_template('pages/login.html'), 200
+        # if no active jwt, render login page
+        if 'JWT' not in session:
+            return render_template('pages/login.html'), 200
 
         # get user from Users table
         user_table_id = User.query.filter_by(
