@@ -634,19 +634,16 @@ def create_app(test_config=None):
 
         # load observation body data
         plant_id = body.get('plantID')
-        name = body.get('name')
         date = body.get('date')
         notes = body.get('notes')
 
         # ensure required fields have data
-        if ((name == '') or (date == '')
-                or (plant_id == '')):
+        if ((date == '') or (plant_id == '')):
             abort(422)
 
         # create a new observation
-        observation = Observation(user_id=user_id,
-                                  name=name, date=date, plant_id=plant_id,
-                                  notes=notes)
+        observation = Observation(user_id=user_id, date=date,
+                                  plant_id=plant_id, notes=notes)
 
         try:
             # add observation to the database

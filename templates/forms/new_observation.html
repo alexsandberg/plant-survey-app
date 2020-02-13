@@ -7,16 +7,6 @@
         <form id="observation-form" class="form-vertical" role="form" autocomplete="off">
 
             <div class="form-group">
-                <label for="observation_name" class="control-label">Your Name</label>
-                {% if session['jwt_payload']['name'] %}
-                <input type="text" class="form-control" name="name" id="observation_name"
-                    placeholder="{{ session['jwt_payload']['name'] }}" required>
-                {% elif session['jwt_payload']['email'] %}
-                <input type="text" class="form-control" name="name" id="observation_name"
-                    placeholder="{{ session['jwt_payload']['email'] }}" required>
-                {% endif %}
-            </div>
-            <div class="form-group">
                 <label for="datetimeField" class="control-label">Date</label>
                 <input type="datetime-local" class="form-control" name="date" id="datetimeField" value="">
             </div>
@@ -86,17 +76,11 @@
 
 
     function sendObservationPOST() {
-        let name = document.getElementById("observation_name").value;
-        console.log('name: ', name)
         let date = document.getElementById("datetimeField").value;
-        console.log('date: ', date)
         let notes = document.getElementById("observation_textarea").value;
-        console.log('notes: ', notes)
         let plantID = plantData.getAttribute("data-id");
-        console.log('plantID: ', plantID)
 
         let data = {
-            "name": name,
             "date": date,
             "notes": notes,
             "plantID": plantID
