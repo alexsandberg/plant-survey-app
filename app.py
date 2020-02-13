@@ -451,11 +451,8 @@ def create_app(test_config=None):
         # get request body
         body = request.get_json()
 
-        # get email from session or body
-        if 'jwt_payload' in session and 'email' in session['jwt_payload']:
-            contributor_email = session['jwt_payload']['email']
-        else:
-            contributor_email = body.get('contributorEmail')
+        # get user table id from session
+        user_id = session['profile']['user_table_id']
 
         # load plant form data
         name = body.get('name')
@@ -464,12 +461,12 @@ def create_app(test_config=None):
         image_link = body.get('imageLink')
 
         # ensure all fields have data
-        if ((contributor_email is None) or (name == "") or (latin_name == "")
+        if ((name == "") or (latin_name == "")
                 or (description == "") or (image_link == "")):
             abort(422)
 
         # create a new plant
-        plant = Plant(contributor_email=contributor_email, name=name,
+        plant = Plant(user_id=user_id, name=name,
                       latin_name=latin_name, description=description,
                       image_link=image_link)
 
