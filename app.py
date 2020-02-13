@@ -153,7 +153,7 @@ def create_app(test_config=None):
             print('ERROR: ', str(e))
             abort(422)
 
-        return True
+        return new_user.id
 
     # AUTH ROUTES -- AUTH0 BOILERPLATE
 
@@ -177,6 +177,8 @@ def create_app(test_config=None):
         if check_if_user_exists(user_id):
 
             # get user info from Users table
+            user_table_id = User.query.filter_by(
+                user_id=user_id).one_or_none().id
             name = User.query.filter_by(user_id=user_id).one_or_none().name
             username = User.query.filter_by(
                 user_id=user_id).one_or_none().username
@@ -185,6 +187,7 @@ def create_app(test_config=None):
             role = User.query.filter_by(user_id=user_id).one_or_none().role
 
             # add to user info
+            user['user_table_id'] = user_table_id
             user['name'] = name
             user['username'] = username
             user['date_added'] = date_added
@@ -219,22 +222,17 @@ def create_app(test_config=None):
             # set date added to now
             user['date_added'] = datetime.utcnow()
 
-            # add new user to Users table
-            create_new_user(user)
+            # add new user to Users table, save user_table_id
+            user_table_id = create_new_user(user)
+            user['user_table_id'] = user_table_id
 
         # add session variables
         session['logged_in'] = True
         session[constants.JWT_PAYLOAD] = userinfo
         session[constants.JWT] = token['access_token']
         session[constants.PROFILE_KEY] = user
-        # session[constants.PROFILE_KEY] = {
-        #     'user_id': user_id,
-        #     'username': username,
-        #     # 'permissions': permissions,
-        #     'role': role,
-        #     'name': user['name'],
-        #     'picture': userinfo['picture']
-        # }
+
+        # print('SESSION PROFILE: ', session)
 
         return redirect('/dashboard')
 

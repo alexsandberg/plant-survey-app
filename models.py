@@ -37,6 +37,8 @@ def format_plant_observations(plant_observations):
     return [observation.format() for observation in plant_observations]
 
 # format plants
+
+
 def format_plants(plants):
     return [plant.format() for plant in plants]
 
@@ -146,6 +148,8 @@ class Observation(db.Model):
 '''
 User
 '''
+
+
 class User(db.Model):
     __tablename__ = 'Users'
 
@@ -154,13 +158,12 @@ class User(db.Model):
     username = Column(String(120), nullable=False)
     user_id = Column(String(120), nullable=False)
     date_added = Column(db.DateTime, nullable=False,
-                  default=datetime.utcnow)
+                        default=datetime.utcnow)
     role = Column(String(120), nullable=False)
     observations = db.relationship(
         'Observation', backref='user', lazy=True)
     plants = db.relationship(
         'Plant', backref='user', lazy=True)
-    
 
     def __init__(self, name, username, user_id, date_added, role):
         self.name = name
