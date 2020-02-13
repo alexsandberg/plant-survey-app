@@ -68,7 +68,7 @@ def create_app(test_config=None):
                 return f(*args, **kwargs)
             else:
                 flash('You need to login first')
-                return redirect(url_for('home'))
+                return render_template('pages/login.html'), 200
         return wrap
 
     # add login link function to jinja context
@@ -140,7 +140,6 @@ def create_app(test_config=None):
     # add user if not in database
 
     def create_new_user(user):
-        print('NEW USER: ', user)
 
         # create new user
         new_user = User(name=user['name'],
@@ -235,7 +234,7 @@ def create_app(test_config=None):
         session[constants.JWT] = token['access_token']
         session[constants.PROFILE_KEY] = user
 
-        print('SESSION PROFILE: ', session)
+        # print('SESSION PROFILE: ', session)
 
         return redirect('/dashboard')
 
