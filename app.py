@@ -71,6 +71,9 @@ def create_app(test_config=None):
                 return redirect(url_for('home'))
         return wrap
 
+    # add login link function to jinja context
+    app.jinja_env.globals.update(create_login_link=create_login_link)
+
     # UTILITY FUNCTIONS
 
     # plant formatting
@@ -284,9 +287,6 @@ def create_app(test_config=None):
     # home page route handler
     @app.route('/')
     def home():
-
-        # add login link function to jinja context
-        app.jinja_env.globals.update(create_login_link=create_login_link)
 
         return redirect('plants')
 
