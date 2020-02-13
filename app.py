@@ -235,7 +235,7 @@ def create_app(test_config=None):
         session[constants.JWT] = token['access_token']
         session[constants.PROFILE_KEY] = user
 
-        # print('SESSION PROFILE: ', session)
+        print('SESSION PROFILE: ', session)
 
         return redirect('/dashboard')
 
@@ -256,11 +256,12 @@ def create_app(test_config=None):
     # ------------------------------------
 
     @app.route('/dashboard')
+    @login_required
     def dashboard():
 
-        # if no active jwt, redirect to home login page
-        if 'jwt_payload' not in session:
-            return render_template('pages/login.html'), 200
+        # # if no active jwt, redirect to home login page
+        # if 'jwt_payload' not in session:
+        #     return render_template('pages/login.html'), 200
 
         # get user from Users table
         user_table_id = User.query.filter_by(
