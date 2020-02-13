@@ -108,10 +108,8 @@ def create_app(test_config=None):
 
         # if user not found return false
         if user is None:
-            print('USER NOT FOUND')
             return False
         else:
-            print('USER FOUND')
             return True
 
     # add 'Public' role to user
@@ -127,15 +125,14 @@ def create_app(test_config=None):
             ]
         }
 
-        # this works!!!! catch exceptions
         # call management API with user_id and role
         role_resp = requests.post(f'https://plant-survey.auth0.com/api/v2/users/{user_id}/roles',
                                   headers={
                                       'Authorization': f"Bearer {mgmt_token}"},
                                   json=data)
-        # role_info = role_resp.json()
 
-        # print('ROLE INFO: ', role_info)
+        # raises exception for any 4xx or 5xx errors
+        role_resp.raise_for_status()
 
     # add user if not in database
 
@@ -224,20 +221,6 @@ def create_app(test_config=None):
 
             # add new user to Users table
             create_new_user(user)
-
-        # get permissions from management api
-        # permissions_resp = requests.get(f'https://plant-survey.auth0.com/api/v2/users/{user_id}/permissions', headers={'Authorization': f"Bearer {mgmt_token}"})
-        # permissions_info = permissions_resp.json()
-        # permissions = [permission['permission_name'] for permission in permissions_info]
-        # print('PERMISSIONS: ', permissions)
-
-        # get user's roles from management api
-        # roles_resp = requests.get(f'https://plant-survey.auth0.com/api/v2/users/{user_id}/roles', headers={'Authorization': f"Bearer {mgmt_token}"})
-        # roles_info = roles_resp.json()
-        # role = roles_info[0]['name']
-        # print('ROLE: ', role)
-
-        print('USER INFO FINAL: ', user)
 
         # add session variables
         session['logged_in'] = True
