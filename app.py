@@ -457,8 +457,13 @@ def create_app(test_config=None):
         # get request body
         body = request.get_json()
 
-        # get user table id from session
-        user_id = session['profile']['user_table_id']
+        # get user table id from session or jwt
+        if 'profile' in session:
+            user_id = session['profile']['user_table_id']
+        else:
+            auth0_user_id = jwt['sub']
+            user_id = User.query.filter_by(
+                user_id=auth0_user_id).one_or_none().id
 
         # load plant form data
         name = body.get('name')
@@ -632,8 +637,13 @@ def create_app(test_config=None):
         # get request body
         body = request.get_json()
 
-        # get user table id from session
-        user_id = session['profile']['user_table_id']
+        # get user table id from session or jwt
+        if 'profile' in session:
+            user_id = session['profile']['user_table_id']
+        else:
+            auth0_user_id = jwt['sub']
+            user_id = User.query.filter_by(
+                user_id=auth0_user_id).one_or_none().id
 
         # load observation body data
         plant_id = body.get('plantID')
