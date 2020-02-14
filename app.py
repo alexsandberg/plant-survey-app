@@ -67,7 +67,7 @@ def create_app(test_config=None):
             if 'logged_in' in session:
                 return f(*args, **kwargs)
             else:
-                flash('You need to login first')
+                flash('You need to sign in first')
                 return render_template('pages/login.html'), 200
         return wrap
 

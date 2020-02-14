@@ -43,14 +43,11 @@
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                 </form>
                 <form action="/dashboard">
-                    {% if not session['jwt_payload'] %}
-                    <button type="submit" class="btn btn-primary">Login</button>
-                    {% elif session['jwt_payload']['given_name'] %}
-                    <button type="submit" class="btn btn-primary">{{ session['jwt_payload']['given_name'] }}</button>
-                    {% elif session['jwt_payload']['email'] %}
-                    <button type="submit" class="btn btn-primary">{{ session['jwt_payload']['email'] }}</button>
+                    {% if session['profile'] %}
+                    <button type="submit" class="btn btn-primary">{{ session['profile']['username'] }}</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-primary">Sign In</button>
                     {% endif %}
-
                 </form>
             </div>
         </nav>

@@ -13,6 +13,7 @@ h1, h2 {
     padding-top: 60px;
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .posts-container {
@@ -90,4 +91,26 @@ h1, h2 {
 
 .api-key-card {
     max-width: 600px;
+}
+
+.btn-login {
+    margin-top: 20px;
+    max-width: 200px;
+}
+
+.btn-logout {
+    margin: 20px;
+    max-width: 200px;
+}
+
+#login-container {
+    margin-top: 100px;
+    display: flex;
+    justify-content: center;
+}
+
+.login-box {
+    justify-content: center;
+    display: flex;
+    flex-flow: wrap;
 }
