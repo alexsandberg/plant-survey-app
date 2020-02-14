@@ -26,11 +26,10 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public."Observations" (
     id integer NOT NULL,
-    name character varying(120) NOT NULL,
+    user_id integer NOT NULL,
     date timestamp without time zone NOT NULL,
     plant_id integer NOT NULL,
-    notes character varying(2500),
-    contributor_email character varying(120) NOT NULL
+    notes character varying(2500)
 );
 
 
@@ -59,26 +58,26 @@ ALTER SEQUENCE public."Observations_id_seq" OWNED BY public."Observations".id;
 
 
 --
--- Name: Plant; Type: TABLE; Schema: public; Owner: alex
+-- Name: Plants; Type: TABLE; Schema: public; Owner: alex
 --
 
-CREATE TABLE public."Plant" (
+CREATE TABLE public."Plants" (
     id integer NOT NULL,
+    user_id integer NOT NULL,
     name character varying(120) NOT NULL,
     latin_name character varying(120) NOT NULL,
     description character varying(2500) NOT NULL,
-    image_link character varying(500) NOT NULL,
-    contributor_email character varying(120) NOT NULL
+    image_link character varying(500) NOT NULL
 );
 
 
-ALTER TABLE public."Plant" OWNER TO alex;
+ALTER TABLE public."Plants" OWNER TO alex;
 
 --
--- Name: Plant_id_seq; Type: SEQUENCE; Schema: public; Owner: alex
+-- Name: Plants_id_seq; Type: SEQUENCE; Schema: public; Owner: alex
 --
 
-CREATE SEQUENCE public."Plant_id_seq"
+CREATE SEQUENCE public."Plants_id_seq"
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -87,13 +86,51 @@ CREATE SEQUENCE public."Plant_id_seq"
     CACHE 1;
 
 
-ALTER TABLE public."Plant_id_seq" OWNER TO alex;
+ALTER TABLE public."Plants_id_seq" OWNER TO alex;
 
 --
--- Name: Plant_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alex
+-- Name: Plants_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alex
 --
 
-ALTER SEQUENCE public."Plant_id_seq" OWNED BY public."Plant".id;
+ALTER SEQUENCE public."Plants_id_seq" OWNED BY public."Plants".id;
+
+
+--
+-- Name: Users; Type: TABLE; Schema: public; Owner: alex
+--
+
+CREATE TABLE public."Users" (
+    id integer NOT NULL,
+    name character varying(120) NOT NULL,
+    username character varying(120) NOT NULL,
+    user_id character varying(120) NOT NULL,
+    date_added timestamp without time zone NOT NULL,
+    role character varying(120) NOT NULL
+);
+
+
+ALTER TABLE public."Users" OWNER TO alex;
+
+--
+-- Name: Users_id_seq; Type: SEQUENCE; Schema: public; Owner: alex
+--
+
+CREATE SEQUENCE public."Users_id_seq"
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."Users_id_seq" OWNER TO alex;
+
+--
+-- Name: Users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alex
+--
+
+ALTER SEQUENCE public."Users_id_seq" OWNED BY public."Users".id;
 
 
 --
@@ -115,25 +152,42 @@ ALTER TABLE ONLY public."Observations" ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- Name: Plant id; Type: DEFAULT; Schema: public; Owner: alex
+-- Name: Plants id; Type: DEFAULT; Schema: public; Owner: alex
 --
 
-ALTER TABLE ONLY public."Plant" ALTER COLUMN id SET DEFAULT nextval('public."Plant_id_seq"'::regclass);
+ALTER TABLE ONLY public."Plants" ALTER COLUMN id SET DEFAULT nextval('public."Plants_id_seq"'::regclass);
+
+
+--
+-- Name: Users id; Type: DEFAULT; Schema: public; Owner: alex
+--
+
+ALTER TABLE ONLY public."Users" ALTER COLUMN id SET DEFAULT nextval('public."Users_id_seq"'::regclass);
 
 
 --
 -- Data for Name: Observations; Type: TABLE DATA; Schema: public; Owner: alex
 --
 
-COPY public."Observations" (id, name, date, plant_id, notes, contributor_email) FROM stdin;
+COPY public."Observations" (id, user_id, date, plant_id, notes) FROM stdin;
 \.
 
 
 --
--- Data for Name: Plant; Type: TABLE DATA; Schema: public; Owner: alex
+-- Data for Name: Plants; Type: TABLE DATA; Schema: public; Owner: alex
 --
 
-COPY public."Plant" (id, name, latin_name, description, image_link, contributor_email) FROM stdin;
+COPY public."Plants" (id, user_id, name, latin_name, description, image_link) FROM stdin;
+\.
+
+
+--
+-- Data for Name: Users; Type: TABLE DATA; Schema: public; Owner: alex
+--
+
+COPY public."Users" (id, name, username, user_id, date_added, role) FROM stdin;
+1	Alex Sandberg	Alex Sandberg	google-oauth2|100849711247597969416	2020-02-09 18:19:28.480359	Admin
+27	asb163@yahoo.com	alexsb163	auth0|5e45c2ff8a409e0e62024a50	2020-02-14 17:42:28.219483	Public
 \.
 
 
@@ -142,8 +196,7 @@ COPY public."Plant" (id, name, latin_name, description, image_link, contributor_
 --
 
 COPY public.alembic_version (version_num) FROM stdin;
-19fcc623bd9e
-5366394e4835
+7225f407d169
 \.
 
 
@@ -151,14 +204,21 @@ COPY public.alembic_version (version_num) FROM stdin;
 -- Name: Observations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: alex
 --
 
-SELECT pg_catalog.setval('public."Observations_id_seq"', 10, true);
+SELECT pg_catalog.setval('public."Observations_id_seq"', 4, true);
 
 
 --
--- Name: Plant_id_seq; Type: SEQUENCE SET; Schema: public; Owner: alex
+-- Name: Plants_id_seq; Type: SEQUENCE SET; Schema: public; Owner: alex
 --
 
-SELECT pg_catalog.setval('public."Plant_id_seq"', 19, true);
+SELECT pg_catalog.setval('public."Plants_id_seq"', 13, true);
+
+
+--
+-- Name: Users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: alex
+--
+
+SELECT pg_catalog.setval('public."Users_id_seq"', 27, true);
 
 
 --
@@ -170,11 +230,19 @@ ALTER TABLE ONLY public."Observations"
 
 
 --
--- Name: Plant Plant_pkey; Type: CONSTRAINT; Schema: public; Owner: alex
+-- Name: Plants Plants_pkey; Type: CONSTRAINT; Schema: public; Owner: alex
 --
 
-ALTER TABLE ONLY public."Plant"
-    ADD CONSTRAINT "Plant_pkey" PRIMARY KEY (id);
+ALTER TABLE ONLY public."Plants"
+    ADD CONSTRAINT "Plants_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: Users Users_pkey; Type: CONSTRAINT; Schema: public; Owner: alex
+--
+
+ALTER TABLE ONLY public."Users"
+    ADD CONSTRAINT "Users_pkey" PRIMARY KEY (id);
 
 
 --
@@ -190,7 +258,23 @@ ALTER TABLE ONLY public.alembic_version
 --
 
 ALTER TABLE ONLY public."Observations"
-    ADD CONSTRAINT "Observations_plant_id_fkey" FOREIGN KEY (plant_id) REFERENCES public."Plant"(id);
+    ADD CONSTRAINT "Observations_plant_id_fkey" FOREIGN KEY (plant_id) REFERENCES public."Plants"(id);
+
+
+--
+-- Name: Observations Observations_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alex
+--
+
+ALTER TABLE ONLY public."Observations"
+    ADD CONSTRAINT "Observations_user_id_fkey" FOREIGN KEY (user_id) REFERENCES public."Users"(id);
+
+
+--
+-- Name: Plants Plants_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alex
+--
+
+ALTER TABLE ONLY public."Plants"
+    ADD CONSTRAINT "Plants_user_id_fkey" FOREIGN KEY (user_id) REFERENCES public."Users"(id);
 
 
 --
