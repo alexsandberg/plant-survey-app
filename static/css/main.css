@@ -3,7 +3,7 @@ header {
     
 }
 
-h1, h2, h3, h4 {
+h1, h2, h4 {
     margin: auto;
     width: 100%;
     text-align: center;
@@ -91,6 +91,7 @@ h1, h2, h3, h4 {
 
 .api-key-card {
     max-width: 600px;
+    margin: auto;
 }
 
 .btn-login {
