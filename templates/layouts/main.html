@@ -42,13 +42,21 @@
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                 </form>
-                <form action="/dashboard">
-                    {% if session['profile'] %}
-                    <button type="submit" class="btn btn-primary">{{ session['profile']['username'] }}</button>
-                    {% else %}
-                    <button type="submit" class="btn btn-primary">Sign In</button>
-                    {% endif %}
-                </form>
+                {% if 'profile' not in session %}
+                <a class="btn btn-primary" href="/login">Sign In</a>
+                {% else %}
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ session['profile']['username'] }}
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="/dashboard">Dashboard</a>
+                        <a class="dropdown-item" href="/logout">Sign Out</a>
+                        <a class="dropdown-item" href="/api/key">API</a>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </nav>
     </header>

@@ -46,18 +46,13 @@
     {% endfor %}
 </div>
 
-
-
-<div class="container" id="login-container">
-    <div class="login-page clearfix">
-        <div class="login-box auth0-box before">
-            {% if (plants|length == 0) and (observations|length == 0) %}
-            <h4>Looks like there's nothing here!</h4>
-            {% endif %}
-            <a id="qsLogoutBtn" class="btn btn-primary btn-lg btn-logout btn-block" href="/logout">Sign Out</a>
-        </div>
-    </div>
+<div class="container">
+    {% if (plants|length == 0) and (observations|length == 0) %}
+    <h4>Looks like there's nothing here!</h4>
+    {% endif %}
 </div>
+
+
 
 
 {% endblock %}
