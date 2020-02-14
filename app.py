@@ -684,12 +684,28 @@ def create_app(test_config=None):
         # get id from kwargs
         id = kwargs['id']
 
+        # get jwt from args
+        jwt = args[0]
+
         # get observation by id
         observation = Observation.query.filter_by(id=id).one_or_none()
 
         # abort 404 if no observation found
         if observation is None:
             abort(404)
+
+        # get user table id from session or jwt
+        if 'profile' in session:
+            user_id = session['profile']['user_table_id']
+        else:
+            auth0_user_id = jwt['sub']
+            user_id = User.query.filter_by(
+                user_id=auth0_user_id).one_or_none().id
+
+        # abort if request user_id doesn't match observation user_id
+        # users can only edit/delete their own observations
+        if observation.user_id != user_id:
+            abort(401)
 
         # if PATCH
         if request.method == 'PATCH':
