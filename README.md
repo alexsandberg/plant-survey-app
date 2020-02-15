@@ -25,7 +25,7 @@ This tool is the capstone project for the [Udacity Full Stack Web Developer Nano
 ### Getting Started
 
 * Base URL: Plant and observations data can be accessed directly through the API, using the base URL `https://plant-survey-tool.herokuapp.com/api`. Alternatively, utilize the frontend at [https://plant-survey-tool.herokuapp.com/](https://plant-survey-tool.herokuapp.com/).
-* Authentication: Most endpoints require either Public or Admin permissions. This version does not require authentication or API keys.
+* Authentication: Most endpoints require either Public or Admin permissions. Navigate to [https://plant-survey-tool.herokuapp.com/api/key](https://plant-survey-tool.herokuapp.com/api/key) and create an account or sign in to obtain an API key. Default authorization is "Public".
 
 ### Error Handling
 
@@ -41,7 +41,6 @@ The API will return the following types of errors:
 
 * 400 – bad request
 * 401 – unauthorized
-* 401 – authorization_header_missing
 * 404 – resource not found
 * 405 – method not allowed
 * 422 – unprocessable
@@ -55,66 +54,123 @@ The API will return the following types of errors:
   * Does not require authorization.
 * Sample request: 
     ```bash
-    curl https://plant-survey-tool.herokuapp.com/plants
+    curl https://plant-survey-tool.herokuapp.com/api/plants
     ```
-* Response:
+* Sample response:
     ```
     {
         "plants": [
             {
-                "description": "Plants perennial, 30-70 cm tall. Stems glabrous and glaucus. Flowers in loose spike with 2 exserted stamens.",
-                "id": 3,
-                "image_link": "http://www.cnhp.colostate.edu/rareplants/images/1/closeup3_19662.jpg",
-                "latin_name": "Penstemon harringtonii",
-                "name": "Harrington’s beardtongue",
+                "description": "A squat, globular, spiny succulent. Each mature stem is 3-12 cm tall, 4-9 cm wide; the largest observed was 24 cm tall x 14 cm wide. However, during the driest part of the year the stem may shrink to below ground-level. Central spines are straight (hookless). The plants are inconspicuous except when in flower (April-May), when showy, fragrant, pink to magenta flowers appear at the top of the stem.",
+                "id": 6,
+                "image_link": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_16984.jpg",
+                "latin_name": "Sclerocactus glaucus",
+                "name": "Colorado hookless cactus",
                 "plant_observations": [
                     {
-                        "date": "Thu, 09 Jan 2020 16:55:24 GMT",
-                        "id": 2,
-                        "name": "Alex Sandberg",
-                        "notes": "seen hiking in San Juan Mnts",
-                        "plant_id": 3
+                        "date": "June 21, 2018",
+                        "datetime": "Thu, 21 Jun 2018 11:11:00 GMT",
+                        "id": 7,
+                        "notes": "Seen near Glenwood Springs.",
+                        "plant_id": 6,
+                        "plant_image": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_16984.jpg",
+                        "plant_name": "Colorado hookless cactus",
+                        "user_id": 27
+                    },
+                    {
+                        "date": "June 10, 2018",
+                        "datetime": "Sun, 10 Jun 2018 16:26:00 GMT",
+                        "id": 10,
+                        "notes": "Saw several on trail outside Grand Junction.",
+                        "plant_id": 6,
+                        "plant_image": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_16984.jpg",
+                        "plant_name": "Colorado hookless cactus",
+                        "user_id": 1
                     }
-                ]
-            },
+                ],
+                "user_id": 1
+            }, 
             {
-                "description": "Flower petals 6-10 mm/0.2-0.4 in long, white with a yellow base.",
-                "id": 4,
-                "image_link": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_20366.jpg",
-                "latin_name": "Physaria vicina",
-                "name": "Good-neighbor bladderpod",
+                "description": "Plants perennial, 30-70 cm tall. Stems glabrous and glaucus. Flowers in loose spike with 2 exserted stamens. Corolla deep blue to pinkish lavender.", 
+                "id": 1, 
+                "image_link": "http://www.cnhp.colostate.edu/rareplants/images/1/closeup3_19662.jpg", 
+                "latin_name": "Penstemon harringtonii", 
+                "name": "Harrington\u2019s beardtongue", 
                 "plant_observations": [
                     {
-                        "date": "Sat, 09 Nov 2019 10:55:24 GMT",
-                        "id": 3,
-                        "name": "Alex Sandberg",
-                        "notes": "seen hiking in RMNP",
-                        "plant_id": 4
+                        "date": "September 04, 2019", 
+                        "datetime": "Wed, 04 Sep 2019 16:28:00 GMT", 
+                        "id": 11, 
+                        "notes": "Came across this in collegiate mountains near Salida.", 
+                        "plant_id": 1, 
+                        "plant_image": "http://www.cnhp.colostate.edu/rareplants/images/1/closeup3_19662.jpg", 
+                        "plant_name": "Harrington\u2019s beardtongue", 
+                        "user_id": 1
                     }
-                ]
-            },
+                ], 
+                "user_id": 1
+            }, 
             {
-                "description": "Physaria pruinosa begins to flower by mid May with fruiting time depending on elevation.",
-                "id": 5,
-                "image_link": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_18927.jpg",
-                "latin_name": "Physaria pruinosa",
-                "name": "Pagosa bladderpod",
-                "plant_observations": [
-                    {
-                        "date": "Sun, 21 Jul 2019 12:14:02 GMT",
-                        "id": 4,
-                        "name": "Alex Sandberg",
-                        "notes": "seen in Gunnison",
-                        "plant_id": 5
-                    }
-                ]
-            },
+                "description": "Stoloniferous perennial, stems 5-30 cm long. New fertile plants are produced wherever roots take hold.", 
+                "id": 11, 
+                "image_link": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_21230.jpg", 
+                "latin_name": "Mimulus eastwoodiae", 
+                "name": "Eastwood monkey-flower", 
+                "plant_observations": [], 
+                "user_id": 1
+            }, 
         ], 
         "success": true
     }
     ```
 
-#### POST /plants
+#### GET /plants/\<id\>
+
+* General:
+  * Returns a plant using URL parameters specifying id of plant.
+  * Does not require authorization.
+* Sample request: 
+    ```bash
+    curl https://plant-survey-tool.herokuapp.com/api/plants/6
+    ```
+* Response:
+    ```
+    {
+        "plant": {
+            "description": "A squat, globular, spiny succulent. Each mature stem is 3-12 cm tall, 4-9 cm wide; the largest observed was 24 cm tall x 14 cm wide. However, during the driest part of the year the stem may shrink to below ground-level. Central spines are straight (hookless). The plants are inconspicuous except when in flower (April-May), when showy, fragrant, pink to magenta flowers appear at the top of the stem.", 
+            "id": 6, 
+            "image_link": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_16984.jpg", 
+            "latin_name": "Sclerocactus glaucus", 
+            "name": "Colorado hookless cactus", 
+            "plant_observations": [
+                {
+                    "date": "June 21, 2018", 
+                    "datetime": "Thu, 21 Jun 2018 11:11:00 GMT", 
+                    "id": 7, 
+                    "notes": "Seen near Glenwood Springs.", 
+                    "plant_id": 6, 
+                    "plant_image": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_16984.jpg", 
+                    "plant_name": "Colorado hookless cactus", 
+                    "user_id": 27
+                }, 
+                {
+                    "date": "June 10, 2018", 
+                    "datetime": "Sun, 10 Jun 2018 16:26:00 GMT", 
+                    "id": 10, 
+                    "notes": "Saw several on trail outside Grand Junction.", 
+                    "plant_id": 6, 
+                    "plant_image": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_16984.jpg", 
+                    "plant_name": "Colorado hookless cactus", 
+                    "user_id": 1
+                }
+            ], 
+            "user_id": 1
+        }, 
+        "success": true
+    }
+    ```
+
+#### POST /plants/new
 
 * General:
   * Creates a new plant and adds it to the database.
@@ -122,23 +178,25 @@ The API will return the following types of errors:
     * Execute ```export ADMIN_ROLE_TOKEN=<active_admin_jwt>``` with active Admin JWT before request.
 * Sample request:
     ```bash
-    curl -d '{"name": "eastwood monkey-flower", "latinName": "Mimulus eastwoodiae", "description": "Stoloniferous perennial, stems 5-30 cm long. New fertile plants are produced wherever roots take hold.", "imageLink": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_21230.jpg"}' -H "Content-Type: application/json" -H "Authorization: Bearer $ADMIN_ROLE_TOKEN" -X POST https://plant-survey-tool.herokuapp.com/plants
+    curl -d '{"name": "eastwood monkey-flower", "latinName": "Mimulus eastwoodiae", "description": "Stoloniferous perennial, stems 5-30 cm long. New fertile plants are produced wherever roots take hold.", "imageLink": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_21230.jpg"}' -H "Content-Type: application/json" -H "Authorization: Bearer $ADMIN_ROLE_TOKEN" -X POST https://plant-survey-tool.herokuapp.com/api/plants/new
     ```
 * Response:
     ```
     {
         "plant": {
             "description": "Stoloniferous perennial, stems 5-30 cm long. New fertile plants are produced wherever roots take hold.", 
-            "id": 15, 
+            "id": 14, 
             "image_link": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_21230.jpg", 
             "latin_name": "Mimulus eastwoodiae", 
-            "name": "eastwood monkey-flower"
+            "name": "eastwood monkey-flower", 
+            "plant_observations": [], 
+            "user_id": 1
         }, 
         "success": true
     }
     ```
 
-#### PATCH /plants/\<id\>
+#### PATCH /plants/\<id\>/edit
 
 * General:
     * Updates an existing plant using URL parameters specifying id of plant to be updated.
@@ -147,23 +205,25 @@ The API will return the following types of errors:
         * Execute ```export ADMIN_ROLE_TOKEN=<active_admin_jwt>``` with active Admin JWT before request.
 * Sample request:
     ```bash
-    curl -d '{"name": "Eastwood Monkey-Flower", "latinName": null, "description": null, "imageLink": null}' -H "Content-Type: application/json" -H "Authorization: Bearer $ADMIN_ROLE_TOKEN" -X PATCH https://plant-survey-tool.herokuapp.com/plants/15
+    curl -d '{"name": "Eastwood Monkey-Flower", "latinName": null, "description": null, "imageLink": null}' -H "Content-Type: application/json" -H "Authorization: Bearer $ADMIN_ROLE_TOKEN" -X PATCH https://plant-survey-tool.herokuapp.com/api/plants/14/edit
     ```
 * Response:
     ```
     {
         "plant": {
             "description": "Stoloniferous perennial, stems 5-30 cm long. New fertile plants are produced wherever roots take hold.", 
-            "id": 15, 
+            "id": 14, 
             "image_link": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_21230.jpg", 
             "latin_name": "Mimulus eastwoodiae", 
-            "name": "Eastwood Monkey-Flower"
+            "name": "Eastwood Monkey-Flower", 
+            "plant_observations": [], 
+            "user_id": 1
         }, 
         "success": true
     }
     ```
 
-#### DELETE /plants/\<id\>
+#### DELETE /plants/\<id\>/edit
 
 * General:
     * Removes an existing plant from the database using URL parameters specifying id of plant to be deleted.
@@ -171,13 +231,13 @@ The API will return the following types of errors:
         * Execute ```export ADMIN_ROLE_TOKEN=<active_admin_jwt>``` with active Admin JWT before request.
 * Sample request:
     ```bash
-    curl -H "Authorization: Bearer $ADMIN_ROLE_TOKEN" -X DELETE https://plant-survey-tool.herokuapp.com/plants/15
+    curl -H "Authorization: Bearer $ADMIN_ROLE_TOKEN" -X DELETE https://plant-survey-tool.herokuapp.com/api/plants/14/edit
     ```
 * Response:
     ```
     {
-        "plant_id": 15,
-        "plant_name": "Eastwood Monkey-Flower",
+        "plant_id": 14, 
+        "plant_name": "Eastwood Monkey-Flower", 
         "success": true
     }
     ```
@@ -189,39 +249,87 @@ The API will return the following types of errors:
   * Does not require authorization.
 * Sample request: 
     ```bash
-    curl https://plant-survey-tool.herokuapp.com/observations
+    curl https://plant-survey-tool.herokuapp.com/api/observations
     ```
 * Response:
     ```
     {
         "observations": [
             {
-                "date": "Thu, 09 Jan 2020 16:55:24 GMT",
-                "id": 2,
-                "name": "Alex Sandberg",
-                "notes": "seen hiking in San Juan Mnts",
-                "plant_id": 3
-            },
+                "date": "July 12, 2019", 
+                "datetime": "Fri, 12 Jul 2019 13:25:00 GMT", 
+                "id": 9, 
+                "notes": "Seen hiking in Rocky Mountain National Park.", 
+                "plant_id": 1, 
+                "plant_image": "http://www.cnhp.colostate.edu/rareplants/images/1/closeup3_19662.jpg", 
+                "plant_name": "Harrington\u2019s beardtongue", 
+                "user_id": 27
+            }, 
             {
-                "date": "Sat, 09 Nov 2019 10:55:24 GMT",
-                "id": 3,
-                "name": "Alex Sandberg",
-                "notes": "seen hiking in RMNP",
-                "plant_id": 4
-            },
+                "date": "June 21, 2018", 
+                "datetime": "Thu, 21 Jun 2018 11:11:00 GMT", 
+                "id": 7, 
+                "notes": "Seen near Glenwood Springs.", 
+                "plant_id": 6, 
+                "plant_image": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_16984.jpg", 
+                "plant_name": "Colorado hookless cactus", 
+                "user_id": 27
+            }, 
             {
-                "date": "Sun, 21 Jul 2019 12:14:02 GMT",
-                "id": 4,
-                "name": "Alex Sandberg",
-                "notes": "seen in Gunnison",
-                "plant_id": 5
+                "date": "June 10, 2018", 
+                "datetime": "Sun, 10 Jun 2018 16:26:00 GMT", 
+                "id": 10, 
+                "notes": "Saw several on trail outside Grand Junction.", 
+                "plant_id": 6, 
+                "plant_image": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_16984.jpg", 
+                "plant_name": "Colorado hookless cactus", 
+                "user_id": 1
+            }, 
+            {
+                "date": "September 04, 2019", 
+                "datetime": "Wed, 04 Sep 2019 16:28:00 GMT", 
+                "id": 11, 
+                "notes": "Came across this in collegiate mountains near Salida.", 
+                "plant_id": 1, 
+                "plant_image": "http://www.cnhp.colostate.edu/rareplants/images/1/closeup3_19662.jpg", 
+                "plant_name": "Harrington\u2019s beardtongue", 
+                "user_id": 1
             }
-        ],
+        ], 
+        "success": true
+    }
+
+    ```
+
+
+#### GET /observations/\<id\>
+
+* General:
+  * Returns an observation using URL parameters specifying id of observation.
+  * Does not require authorization.
+* Sample request: 
+    ```bash
+    curl https://plant-survey-tool.herokuapp.com/api/observations/9
+    ```
+* Response:
+    ```
+    {
+        "observation": {
+            "date": "July 12, 2019", 
+            "datetime": "Fri, 12 Jul 2019 13:25:00 GMT", 
+            "id": 9, 
+            "notes": "Seen hiking in Rocky Mountain National Park.", 
+            "plant_id": 1, 
+            "plant_image": "http://www.cnhp.colostate.edu/rareplants/images/1/closeup3_19662.jpg", 
+            "plant_name": "Harrington\u2019s beardtongue", 
+            "user_id": 27
+        }, 
         "success": true
     }
     ```
 
-#### POST /observations
+
+#### POST /observations/new
 
 * General:
   * Creates a new observation and adds it to the database.
@@ -233,23 +341,27 @@ The API will return the following types of errors:
 * Sample request:
     * note: value for "date" requires Python datetime.datetime object
     ```bash
-    curl -d '{"name": "Alex Sandberg", "date": "2020-01-16 08:14:02.649787", "plantID": 6, "notes": "seen in Boulder"}' -H "Content-Type: application/json" -H "Authorization: Bearer $PUBLIC_ROLE_TOKEN" -X POST https://plant-survey-tool.herokuapp.com/observations
+    curl -d '{"date": "2020-01-16 08:14:02.649787", "plantID": 11, "notes": "seen in Boulder"}' -H "Content-Type: application/json" -H "Authorization: Bearer $PUBLIC_ROLE_TOKEN" -X POST https://plant-survey-tool.herokuapp.com/api/observations/new 
     ```
 * Response:
     ```
     {
         "observation": {
-            "date": "Thu, 16 Jan 2020 08:14:02 GMT",
-            "id": 5,
-            "name": "Alex Sandberg",
-            "notes": "seen in Boulder",
-            "plant_id": 6
-        },
+            "date": "January 16, 2020", 
+            "datetime": "Thu, 16 Jan 2020 08:14:02 GMT", 
+            "id": 13, 
+            "notes": "seen in Boulder", 
+            "plant_id": 11, 
+            "plant_image": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_21230.jpg", 
+            "plant_name": "Eastwood monkey-flower", 
+            "user_id": 27
+        }, 
         "success": true
     }
+
     ```
 
-#### PATCH /observations/\<id\>
+#### PATCH /observations/\<id\>/edit
 
 * General:
     * Updates an existing observation using URL parameters specifying id of observation to be updated.
@@ -261,23 +373,27 @@ The API will return the following types of errors:
             ```export ADMIN_ROLE_TOKEN=<active_admin_jwt>``` 
 * Sample request:
     ```bash
-    curl -d '{"name": null, "date": null, "plantID": null, "notes": "seen in Boulder while hiking the Mesa Trail"}' -H "Content-Type: application/json" -H "Authorization: Bearer $PUBLIC_ROLE_TOKEN" -X PATCH https://plant-survey-tool.herokuapp.com/observations/5
+    curl -d '{"date": null, "notes": "seen in Boulder while hiking the Mesa Trail"}' -H "Content-Type: application/json" -H "Authorization: Bearer $PUBLIC_ROLE_TOKEN" -X PATCH https://plant-survey-tool.herokuapp.com/api/observations/13/edit
     ```
 * Response:
     ```
     {
         "observation": {
-            "date": "Thu, 16 Jan 2020 08:14:02 GMT",
-            "id": 5,
-            "name": "Alex Sandberg",
-            "notes": "seen in Boulder while hiking the Mesa Trail",
-            "plant_id": 6
-        },
+            "date": "January 16, 2020", 
+            "datetime": "Thu, 16 Jan 2020 08:14:02 GMT", 
+            "id": 13, 
+            "notes": "seen in Boulder while hiking the Mesa Trail", 
+            "plant_id": 11, 
+            "plant_image": "https://cnhp.colostate.edu/rareplants/images/1/closeup1_21230.jpg", 
+            "plant_name": "Eastwood monkey-flower", 
+            "user_id": 27
+        }, 
         "success": true
     }
+
     ```
 
-#### DELETE /observations/\<id\>
+#### DELETE /observations/\<id\>/edit
 
 * General:
     * Removes an existing observation from the database using URL parameters specifying id of observation to be deleted.
@@ -288,13 +404,12 @@ The API will return the following types of errors:
             ```export ADMIN_ROLE_TOKEN=<active_admin_jwt>```
 * Sample request:
     ```bash
-    curl -H "Authorization: Bearer $PUBLIC_ROLE_TOKEN" -X DELETE https://plant-survey-tool.herokuapp.com/observations/5
+    curl -H "Authorization: Bearer $PUBLIC_ROLE_TOKEN" -X DELETE https://plant-survey-tool.herokuapp.com/api/observations/13/edit
     ```
 * Response:
     ```
     {
-        "observation_id": 5,
-        "observation_name": "Alex Sandberg",
+        "observation_id": 13,
         "success": true
     }
     ```
