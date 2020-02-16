@@ -1,0 +1,27 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Plants{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <p>This application is a citizen science tool for surveying rare plants in Colorado. Utilizing a database of
+            plants based on the <a href="https://cnhp.colostate.edu/rareplants/list.asp?list=master"
+                target="_blank">CNHP Colorado
+                Rare Plant Guide</a>, anyone can make an account and add an observation of a plant, contributing data
+            that can be utilized for conservation and scientific research.<br><br>
+
+            The site and application are under development, with the following additional planned features coming
+            soon:<br><br>
+
+            • Full integration of the CNHP rare plant database<br>
+            • Geospatial coordinate information for plant observations, with map visualizations<br>
+            • Additional data fields and information for plants<br>
+            • Plant database search functionality </p>
+        <p>Data is also available directly via an API. <a href="/api/key">Click here to obtain an API key</a>, and read
+            the full documentation at <a href="https://github.com/alexsandberg/plant-survey-app/blob/master/README.md"
+                target="_blank">https://github.com/alexsandberg/plant-survey-app/blob/master/README.md</a><br><br>
+            Author: Alex Sandberg-Bernard
+        </p>
+
+    </div>
+</div>
+{% endblock %}

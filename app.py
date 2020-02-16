@@ -293,6 +293,11 @@ def create_app(test_config=None):
 
         return redirect('plants')
 
+    @app.route('/about')
+    def about():
+
+        return render_template('/pages/about.html'), 200
+
     @app.route('/plants')
     def plants():
         '''
