@@ -14,13 +14,13 @@ database_path = os.getenv('DATABASE_URL')
 
 db = SQLAlchemy()
 
-'''
-setup_db(app)
-    binds a flask application and a SQLAlchemy service
-'''
-
 
 def setup_db(app, database_path=database_path):
+    '''
+    setup_db(app)
+    binds a flask application and a SQLAlchemy service
+    '''
+
     app.config["SQLALCHEMY_DATABASE_URI"] = database_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
@@ -36,9 +36,8 @@ def format_datetime(datetime):
 def format_plant_observations(plant_observations):
     return [observation.format() for observation in plant_observations]
 
+
 # format plants
-
-
 def format_plants(plants):
     return [plant.format() for plant in plants]
 

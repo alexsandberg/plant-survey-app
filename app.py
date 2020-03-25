@@ -81,7 +81,6 @@ def create_app(test_config=None):
         return [plant.format() for plant in plants]
 
     # observation formatting
-
     def format_observations(observations):
         return [observation.format() for observation in observations]
 
@@ -138,7 +137,6 @@ def create_app(test_config=None):
         role_resp.raise_for_status()
 
     # add user if not in database
-
     def create_new_user(user):
 
         # create new user
@@ -157,7 +155,7 @@ def create_app(test_config=None):
 
         return new_user.id
 
-    # AUTH ROUTES -- AUTH0 BOILERPLATE
+    # AUTH ROUTES 
 
     @app.route('/callback')
     def callback_handling():
@@ -233,8 +231,6 @@ def create_app(test_config=None):
         session[constants.JWT_PAYLOAD] = userinfo
         session[constants.JWT] = token['access_token']
         session[constants.PROFILE_KEY] = user
-
-        # print('SESSION PROFILE: ', session)
 
         return redirect('/dashboard')
 
